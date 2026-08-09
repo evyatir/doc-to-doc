@@ -1,0 +1,18 @@
+# Keep the build context small and reproducible. frontend/dist is rebuilt inside
+# the image; uploads, secrets, git history and docs are never needed to build.
+node_modules
+**/node_modules
+frontend/dist
+backend/uploads
+.env
+.env.local
+.env.*.local
+.git
+.gitignore
+.claude
+docs
+deploy
+*.md
+npm-debug.log*
+Dockerfile
+.dockerignore

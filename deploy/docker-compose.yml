@@ -1,0 +1,55 @@
+# One storefront site = one app container (API + built frontend) + its own
+# Postgres + a persistent volume for uploaded images. Primarily for LOCAL
+# testing and for raw-Docker-compose hosts; on Coolify you deploy the app from
+# the Dockerfile and add Postgres/storage via its dashboard (see DEPLOY_VPS.md).
+#
+#   cd deploy && cp .env.site.example .env   # then fill it in
+#   docker compose up -d --build
+#   docker compose exec app node backend/scripts/seed.js   # one-time, loads products
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        CLIENT: ${CLIENT:-demo}
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      # In-box Postgres reached by the compose service name "db".
+      DATABASE_URL: postgres://storefront:${DB_PASSWORD:-storefront}@db:5432/storefront
+      # CRITICAL: the Postgres container has no TLS, so SSL must be OFF. (The
+      # app's "auto" mode would try TLS for a non-localhost host and fail.)
+      DATABASE_SSL: "off"
+      STORAGE_PROVIDER: local
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in deploy/.env}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?set ADMIN_PASSWORD_HASH in deploy/.env}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+    volumes:
+      - uploads:/app/backend/uploads
+    ports:
+      - "${APP_PORT:-3001}:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: storefront
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-storefront}
+      POSTGRES_DB: storefront
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U storefront -d storefront"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  uploads:
+  pgdata:
