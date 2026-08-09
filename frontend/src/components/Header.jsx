@@ -70,7 +70,7 @@ export default function Header() {
           <button
             className="icon-btn"
             aria-label="Account"
-            onClick={() => (FEATURES.accounts ? navigate('/') : toast('Accounts coming soon'))}
+            onClick={() => (FEATURES.accounts ? navigate('/signup') : toast('Accounts coming soon'))}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" strokeWidth="2" />

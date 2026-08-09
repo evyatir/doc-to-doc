@@ -20,6 +20,7 @@ export default function MobileMenu({ onClose }) {
       {FEATURES.giftCard && item('/gift-card', 'Gift card')}
       {PAGES['about'] && item('/p/about', PAGES['about'].title)}
       {item('/contact', 'Contact')}
+      {FEATURES.accounts && item('/signup', 'Sign up / Log in')}
       {FEATURES.cart && item('/cart', 'Cart')}
       <p className="footer-line">{BRAND.footerLine}</p>
     </div>

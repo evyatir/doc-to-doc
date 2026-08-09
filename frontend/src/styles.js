@@ -63,6 +63,13 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
   background: var(--ink); color: var(--paper);
 }
 .btn-outline { background: var(--paper); color: var(--ink); }
+.btn-link {
+  border: none; background: none; padding: 0; min-height: 0;
+  font-family: var(--font-body); font-size: inherit;
+  color: var(--accent); text-decoration: underline;
+  transition: opacity var(--t-fade);
+}
+.btn-link:hover { opacity: 0.6; }
 
 /* ---------- ticker + header ---------- */
 .ticker {

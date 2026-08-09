@@ -15,6 +15,7 @@ import Cart from './pages/Cart.jsx';
 import GiftCard from './pages/GiftCard.jsx';
 import SizeGuide from './pages/SizeGuide.jsx';
 import Contact from './pages/Contact.jsx';
+import SignUp from './pages/SignUp.jsx';
 import Doc from './pages/Doc.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Admin from './pages/admin/Admin.jsx';
@@ -48,6 +49,7 @@ function Layout() {
         <Route path="/gift-card" element={gate(!!FEATURES.giftCard, <GiftCard />)} />
         <Route path="/size-guide" element={<SizeGuide />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/signup" element={gate(FEATURES.accounts, <SignUp />)} />
         <Route path="/p/:slug" element={<Doc />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />

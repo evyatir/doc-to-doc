@@ -120,4 +120,8 @@ export const KEYS = {
   newsletterEndpoint: '',
   analyticsId: '',
   metaPixelId: '',
+  googleClientId: '',        // Google OAuth Client ID for /signup's "Sign in
+                              // with Google" button. Same value as the
+                              // backend's GOOGLE_CLIENT_ID env var. Blank ->
+                              // button doesn't render, email+password still works.
 };

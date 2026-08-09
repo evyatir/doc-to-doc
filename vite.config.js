@@ -18,6 +18,9 @@ export default defineConfig({
       '@client': path.resolve(__dirname, `clients/${client}`),
     },
   },
+  // GH_PAGES=true npm run build -> served from evyatir.github.io/doc-to-doc/,
+  // not the domain root. Unset in every other context (dev, a real host).
+  base: process.env.GH_PAGES ? '/doc-to-doc/' : '/',
   // Dev-only: frontend calls /api/* with no base URL; in production set
   // VITE_API_URL instead (see frontend/src/api.js and README).
   server: { proxy: { '/api': 'http://localhost:3001' } },

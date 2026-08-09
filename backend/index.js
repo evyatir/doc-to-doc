@@ -12,6 +12,7 @@ import { configured } from './db.js';
 import { UPLOADS_DIR } from './storage/local.js';
 import publicRoutes from './routes/public.js';
 import adminRoutes from './routes/admin.js';
+import clientAuthRoutes from './routes/clientAuth.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api', (req, res, next) => {
 });
 
 app.use('/api/admin', adminRoutes);
+app.use('/api/clients', clientAuthRoutes);
 app.use('/api', publicRoutes);
 
 app.use('/api', (req, res) => {

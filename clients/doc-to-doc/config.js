@@ -116,7 +116,8 @@ export const PAGES = {
   'privacy-policy': {
     title: 'Privacy Policy',
     body: [
-      'We collect only the contact details you give us — name, phone, and email — to get back to you about mentorship.',
+      'We collect only the contact details you give us — name, phone, and email — to get back to you about mentorship, and, if you create an account, the details on that form.',
+      'Passwords are stored as a one-way hash, never in plain text. If you sign in with Google, we never see or store your Google password.',
       'We never sell or share your information with third parties.',
     ],
   },
@@ -135,7 +136,7 @@ export const FEATURES = {
   drops: true,                         // powers the Home hero
   instagram: false,                    // no IG content yet — flip on with real posts
   newsletter: true,                    // secondary low-friction capture: "stay updated"
-  accounts: false,
+  accounts: true,                      // /signup — email+password, or Google if KEYS.googleClientId is set
   wishlist: false,
   notifyWhenAvailable: false,
   stickyHeader: true,
@@ -147,4 +148,10 @@ export const KEYS = {
   newsletterEndpoint: '',
   analyticsId: '',
   metaPixelId: '',
+  googleClientId: '',        // TODO: paste the Google OAuth Client ID here
+                              // (console.cloud.google.com/apis/credentials)
+                              // AND set the same value as GOOGLE_CLIENT_ID in
+                              // the backend .env — until then the Google
+                              // button on /signup stays hidden and only
+                              // email+password sign-up works.
 };
