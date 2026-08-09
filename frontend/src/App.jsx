@@ -64,7 +64,7 @@ export default function App() {
   return (
     <ToastProvider>
       <CartProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Layout />
         </BrowserRouter>
       </CartProvider>
