@@ -148,10 +148,9 @@ export const KEYS = {
   newsletterEndpoint: '',
   analyticsId: '',
   metaPixelId: '',
-  googleClientId: '',        // TODO: paste the Google OAuth Client ID here
-                              // (console.cloud.google.com/apis/credentials)
-                              // AND set the same value as GOOGLE_CLIENT_ID in
-                              // the backend .env — until then the Google
-                              // button on /signup stays hidden and only
-                              // email+password sign-up works.
+  // Google Cloud project "Doc to Doc" (doc-to-doc-505018), OAuth client
+  // "doc-to-doc web". Authorized JavaScript origin so far: localhost:5173
+  // only — add the production domain in Google Cloud Console (APIs &
+  // Services > Credentials) once one exists, or the button will fail there.
+  googleClientId: '53594060256-09h5n96tfmaqk4ejoldkv1rm8hjq8lff.apps.googleusercontent.com',
 };
