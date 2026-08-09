@@ -100,7 +100,7 @@ export default function SignUp() {
       if (err instanceof ApiError) {
         if (err.status === 409) setErrors({ email: 'An account with this email already exists' });
         else if (err.status === 401) setErrors({ password: 'Invalid email or password' });
-        else if (err.status === 503) toast('Sign-up is not available yet — please use the contact form instead');
+        else if (err.status === 503 || err.status === 0) toast('Sign-up is not available right now — please use the contact form instead');
         else setErrors(err.body?.fields ? Object.fromEntries(Object.entries(err.body.fields).map(([k, v]) => [k, v[0]])) : {});
       }
     } finally {
