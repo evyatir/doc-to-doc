@@ -281,7 +281,7 @@ router.put('/orders/:id', async (req, res, next) => {
 router.get('/messages', async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, first_name, last_name, email, phone, message, wants_newsletter, created_at
+      `SELECT id, first_name, last_name, email, phone, role, stage, message, created_at
        FROM contact_messages ORDER BY id DESC`
     );
     res.json(result.rows.map((m) => ({
@@ -290,8 +290,9 @@ router.get('/messages', async (req, res, next) => {
       lastName: m.last_name,
       email: m.email,
       phone: m.phone,
+      role: m.role,
+      stage: m.stage,
       message: m.message,
-      wantsNewsletter: m.wants_newsletter,
       createdAt: m.created_at,
     })));
   } catch (err) { next(err); }

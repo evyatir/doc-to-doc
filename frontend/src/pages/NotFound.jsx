@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <main className="page">
       <h1 className="page-h1">Page not found</h1>
-      <div className="empty-cart">
+      <div className="empty-state">
         <Link to="/" className="btn">Back home</Link>
       </div>
     </main>

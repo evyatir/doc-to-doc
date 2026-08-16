@@ -1,19 +1,11 @@
-// /admin — store-owner panel in the same React app. Deliberately excluded
-// from the public nav and footer; plain and dense, styled with the same
-// theme tokens so it reads as the same product family.
+// /admin — internal panel to see who's booked a consultation. Deliberately
+// excluded from the public nav and footer; plain and dense, styled with the
+// same theme tokens so it reads as the same product family.
 import React, { useState } from 'react';
 import { BRAND } from '@client/config';
 import { useSeo } from '../../seo.js';
 import { getToken, setToken, login } from './adminApi.js';
-import AdminProducts from './AdminProducts.jsx';
-import AdminOrders from './AdminOrders.jsx';
 import AdminMessages from './AdminMessages.jsx';
-
-const TABS = [
-  { id: 'products', label: 'Products', C: AdminProducts },
-  { id: 'orders', label: 'Orders', C: AdminOrders },
-  { id: 'messages', label: 'Messages', C: AdminMessages },
-];
 
 function Login({ onDone }) {
   const [password, setPassword] = useState('');
@@ -56,9 +48,8 @@ function Login({ onDone }) {
 }
 
 export default function Admin() {
-  useSeo('Admin', 'Store administration');
+  useSeo('Admin', 'Internal — leads from the consultation form');
   const [authed, setAuthed] = useState(() => !!getToken());
-  const [tab, setTab] = useState('products');
 
   if (!authed) {
     return (
@@ -69,7 +60,6 @@ export default function Admin() {
   }
 
   const logout = () => { setToken(null); setAuthed(false); };
-  const active = TABS.find((t) => t.id === tab);
 
   return (
     <main className="page admin">
@@ -79,21 +69,8 @@ export default function Admin() {
           Sign out
         </button>
       </div>
-      <div className="admin-tabs" role="tablist" aria-label="Admin sections">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={tab === t.id}
-            className={`admin-tab${tab === t.id ? ' active' : ''}`}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      {/* Session expiry inside a tab bounces back to login. */}
-      <active.C onAuthError={() => setAuthed(false)} />
+      {/* Session expiry bounces back to login. */}
+      <AdminMessages onAuthError={() => setAuthed(false)} />
     </main>
   );
 }

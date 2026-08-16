@@ -1,42 +1,78 @@
-// Home: full-bleed hero (current drop) -> category photo bands (zero gap) ->
-// accent band -> Instagram -> footer. Bands are the links.
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BRAND, CATEGORIES, DROPS } from '@client/config';
+import { BRAND, HERO, REASSURANCE, STEPS, HOW_IT_WORKS } from '@client/config';
 import { useSeo } from '../seo.js';
 import Img from '../components/Img.jsx';
-import InstagramGrid from '../components/InstagramGrid.jsx';
 
 export default function Home() {
-  useSeo('Home', `${BRAND.name} — ${BRAND.footerLine || 'shop the collection'}`);
-  const current = DROPS[0];
+  useSeo('Home', BRAND.tagline);
 
   return (
     <main>
-      <Link to="/shop" className="band band-tall" aria-label="Shop all products">
-        <Img className="band-img" src={current?.heroImg} alt="" label={current?.label || 'Hero'} />
-        <div className="band-label">
-          <h1 style={{ fontSize: 'var(--fs-h2)' }}>All Products</h1>
-        </div>
-      </Link>
-
-      {current && (
-        <section className="accent-band">
-          <h2>{current.label}</h2>
-          {current.sub && <p>{current.sub}</p>}
-        </section>
-      )}
-
-      {CATEGORIES.map((c) => (
-        <Link key={c.id} to={`/shop/${c.id}`} className="band band-tall" aria-label={`Shop ${c.label}`}>
-          <Img className="band-img" src={c.img} alt="" label={c.label} />
-          <div className="band-label">
-            <h2 style={{ fontSize: 'var(--fs-h2)' }}>{c.label}</h2>
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="hero-eyebrow">{HERO.eyebrow}</p>
+          <h1 className="hero-h1">
+            {HERO.headline.map((line, i) => (
+              <span key={i} className={i === 1 ? 'hero-h1-accent' : ''}>{line}<br /></span>
+            ))}
+          </h1>
+          <p className="hero-body">{HERO.body}</p>
+          <div className="hero-ctas">
+            <Link to={HERO.ctaPrimary.href} className="btn btn-commerce hero-cta-primary">
+              {HERO.ctaPrimary.label} →
+            </Link>
+            <Link to={HERO.ctaSecondary.href} className="hero-cta-secondary quiet">
+              {HERO.ctaSecondary.label} ↓
+            </Link>
           </div>
-        </Link>
-      ))}
+        </div>
+        <div className="hero-photo-wrap">
+          <Img className="hero-photo" src={HERO.photo} alt="" label="Studying together" />
+          {HERO.photoCaption && <p className="hero-note">{HERO.photoCaption}</p>}
+        </div>
+      </section>
 
-      <InstagramGrid />
+      <section className="quote-band">
+        <div className="quote-band-inner">
+          {REASSURANCE.questions.map((q) => (
+            <p key={q} className="quote-question">{q}</p>
+          ))}
+          <p className="quote-line">{REASSURANCE.line}</p>
+        </div>
+      </section>
+
+      <section className="steps-teaser">
+        <h2 className="section-h2">
+          {HOW_IT_WORKS.headline.map((line, i) => (
+            <span key={i} className={i === 1 ? 'section-h2-accent' : ''}>{line}<br /></span>
+          ))}
+        </h2>
+        <p className="section-kicker">HOW IT WORKS</p>
+        <div className="steps-grid">
+          {STEPS.map((s) => (
+            <div className="step-card" key={s.n}>
+              <span className="step-n">{s.n}</span>
+              <h3 className="step-title">{s.title}</h3>
+              <p className="step-body">{s.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="steps-cta">
+          <Link to="/how-it-works" className="btn">See how it works in detail</Link>
+        </div>
+      </section>
+
+      <section className="why-band">
+        <p className="why-kicker">{HOW_IT_WORKS.quote.kicker}</p>
+        <p className="why-text">“{HOW_IT_WORKS.quote.text}”</p>
+      </section>
+
+      <section className="final-cta">
+        <h2 className="section-h2">Your medical journey doesn't start on your first day of medical school.</h2>
+        <p className="final-cta-sub">It starts with knowing where you're going.</p>
+        <Link to="/book" className="btn btn-commerce final-cta-btn">Book a Consultation</Link>
+      </section>
     </main>
   );
 }

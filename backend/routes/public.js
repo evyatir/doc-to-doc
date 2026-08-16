@@ -128,13 +128,18 @@ router.post('/newsletter', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Backs the Book a Consultation intake form. firstName/lastName come from
+// splitting the page's single "Full name" field (see BookConsultation.jsx);
+// role/stage are new to this site's consultation flow, both optional so a
+// plain /contact-style post still works without them.
 const contactSchema = z.object({
   firstName: z.string().trim().min(1),
   lastName: z.string().trim().min(1),
   email: z.string().trim().email(),
   phone: z.string().trim().max(40).optional().or(z.literal('')),
-  message: z.string().trim().min(1).max(5000),
-  wantsNewsletter: z.boolean().optional().default(false),
+  role: z.enum(['student', 'parent']).optional(),
+  stage: z.string().trim().max(200).optional().or(z.literal('')),
+  message: z.string().trim().max(5000).optional().or(z.literal('')),
 });
 
 router.post('/contact', async (req, res, next) => {
@@ -142,16 +147,10 @@ router.post('/contact', async (req, res, next) => {
   if (!body) return;
   try {
     await query(
-      `INSERT INTO contact_messages (first_name, last_name, email, phone, message, wants_newsletter)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [body.firstName, body.lastName, body.email, body.phone || null, body.message, body.wantsNewsletter]
+      `INSERT INTO contact_messages (first_name, last_name, email, phone, role, stage, message)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [body.firstName, body.lastName, body.email, body.phone || null, body.role || null, body.stage || null, body.message || '']
     );
-    if (body.wantsNewsletter) {
-      await query(
-        'INSERT INTO subscribers (email) VALUES ($1) ON CONFLICT (email) DO NOTHING',
-        [body.email.toLowerCase()]
-      );
-    }
     res.json({ ok: true });
   } catch (err) { next(err); }
 });

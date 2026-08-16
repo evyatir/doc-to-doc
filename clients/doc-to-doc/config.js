@@ -1,156 +1,201 @@
 // ============================================================================
 // CLIENT CONFIG — Doc. to Doc.
-// Mentorship for med-school applicants, run by practicing doctors.
-// Primary conversion goal: get a name + phone/email into /contact so the
-// team can call the applicant back — NOT a checkout flow. Packages below use
-// the storefront's product grid as a browsable "what we offer" list; the
-// WhatsApp handoff (checkout: false) doubles as a fast inquiry channel.
+// A consultancy helping future medical students choose the right med school
+// in Europe, navigate applications, and prepare for what comes next — guided
+// by doctors and medical students who've made the journey themselves.
+//
+// This is NOT a storefront: no cart, no checkout, no product catalog. The
+// core conversion action is booking a free 15-minute intro call.
+// Rebuilt from the client's "WEBSITE GENERAL IDEA" brief (2026-08-16) —
+// real copy, palette, and team bios come from that doc; anything still a
+// placeholder is marked TODO below.
 // ============================================================================
 
 export const BRAND = {
   name: 'Doc. to Doc.',
   domain: '',                          // TODO: fill in once a domain is picked
-  handle: '',                          // TODO: '@doctodoc' if/when IG exists
-  igUrl: '',
-  tiktokUrl: '',
+  logo: new URL('./assets/logo.png', import.meta.url).href,
+  igUrl: '',                           // TODO
   whatsapp: '972500000000',            // TODO: replace with the real WhatsApp number
   email: 'hello@doctodoc.example',     // TODO: replace with the real inbox
   address: '',
-  announcement: 'From applicants to doctors. Now your mentors.',
-  footerLine: 'Mentorship for future doctors, from doctors who have been there.',
-  currency: '₪',
-  freeShipOver: 0,                     // no shipping — hides the cart shipping bar
+  tagline: 'From applicants to doctors. Now your mentors.',
+  footerLine: 'Guided by doctors and medical students who made the journey before you.',
 };
 
 export const THEME = {
-  // ---- colors, read off the flyer: warm cream paper, deep espresso ink,
-  // sage-green accent (the book spine / stethoscope tubing) ----
-  band: '#2A160C',
-  paper: '#F4E9D8',
-  ink: '#2A160C',
-  inkOnBand: '#F4E9D8',
-  accent: '#7C8B69',
-  muted: '#7A6552',
-  focus: '#3E6B4F',
+  // ---- colors, the client's exact palette ----
+  band: '#FFF5E0',        // header/footer background — same as paper, no dark band
+  paper: '#FFF5E0',       // cream page background
+  ink: '#5C381C',         // dark brown — body text, headlines
+  inkOnBand: '#5C381C',   // header/footer text (band === paper here)
+  accent: '#A63C06',      // rust — CTAs, step numbers, links
+  muted: '#8C6F53',       // derived mid-brown for secondary text (not in the swatch, chosen to sit between ink and paper)
+  focus: '#679436',       // sage green — focus rings, ties back to the logo's green
 
-  // ---- fonts: a serif display to match the flyer's "Doc. to Doc." wordmark,
-  // a warm serif body for a mentorship/academic (not retail) feel ----
-  displayFont: 'Playfair Display',
+  displayFont: 'Playfair Display',   // headlines — matches the brief's serif mockups
   bodyFont: 'Lora',
-  accentFont: 'Cormorant Garamond',
+  accentFont: '',                    // italics applied via CSS, not a second family
 
-  // ---- shape: soft, not sharp — this is a care/mentorship brand, not streetwear ----
-  commerceRadius: '999px',
-  radius: '6px',
+  commerceRadius: '6px',   // primary CTA buttons — small rectangle, not a pill (per mockup)
+  radius: '10px',          // cards
 
-  scale: [100, 60, 40, 35, 32, 30, 28, 18, 17, 16, 15],
+  scale: [64, 44, 34, 32, 30, 26, 24, 20, 17, 16, 15],
   motion: { fade: '0.2s ease', recolor: '0.2s ease-in-out' },
 };
 
-// Home page bands + shop filters. Each is a mentorship track, not a product
-// category in the retail sense.
-export const CATEGORIES = [
-  { id: 'application-review', label: 'Application Review', img: '' },
-  { id: 'interview-coaching', label: 'Interview Coaching', img: '' },
-  { id: 'exam-prep', label: 'Entrance Exam Prep', img: '' },
+// Primary nav, left to right. "What we do" was explicitly removed per brief;
+// FAQ leads toward testimonials, so both get their own link; Book stays as
+// the one strong CTA button, not a plain nav link.
+export const NAV = [
+  { to: '/how-it-works', label: 'How it works' },
+  { to: '/who-we-are', label: 'Who we are' },
+  { to: '/faq', label: 'FAQ' },
+  { to: '/testimonials', label: 'What they say about us' },
 ];
 
-// index 0 -> Home hero.
-export const DROPS = [
+// Hero. Photo is intentionally blank — the brief says the current image is
+// only a placeholder ("we want a real photograph of us studying together").
+// Swap in clients/doc-to-doc/assets/ once that photo exists.
+export const HERO = {
+  eyebrow: 'real doctors · real med-school experience · zero corporate nonsense',
+  headline: ['So, you want to', 'become a doctor?'],
+  body: "Good. We know a few things about that. We went from applicants to med students to doctors — now we help future doctors choose the right school, apply smarter, and know what they're actually signing up for.",
+  ctaPrimary: { label: "LET'S GET YOU INTO MED SCHOOL", href: '/book' },
+  ctaSecondary: { label: 'See how it works', href: '/how-it-works' },
+  photo: '',
+  photoCaption: 'future doc. ↓',
+};
+
+// The "in-between" quote section from the brief — sits between the hero
+// area and the deeper pages, doesn't have its own nav item.
+export const REASSURANCE = {
+  questions: [
+    'Which country should I apply to?',
+    'What grades do I need?',
+    'Which entrance exams should I take?',
+    'Is studying medicine abroad right for me?',
+    'What is medical school actually like?',
+  ],
+  line: "You don't need to figure it out alone.",
+};
+
+// How It Works — four steps, as scoped in the brief. Step 1 is the free
+// call; paid service starts at step 2.
+export const STEPS = [
   {
-    id: 'mentorship',
-    label: 'Doc. to Doc. Mentorship',
-    sub: 'From applicants to doctors. Now your mentors.',
-    note: 'Every mentor is a practicing doctor who was once in your seat.',
-    heroImg: '',
-    photos: ['', '', ''],
+    n: '01',
+    title: 'Free 15-minute introduction call',
+    body: 'You tell us briefly about yourself — your goals, your concerns, where you\'re stuck. We explain how Doc. to Doc. can help. No pressure, no pitch — just a real conversation. At the end, you decide if you want to continue.',
+  },
+  {
+    n: '02',
+    title: 'Find your best-fit schools',
+    body: "This is where the paid service begins. We get to know you properly and help narrow down which universities and countries actually make sense for you — not just a list, but what each option is really like academically, practically, and personally.",
+  },
+  {
+    n: '03',
+    title: 'Build the application',
+    body: 'Requirements, documents, deadlines, entrance exams, interviews, strategy — we help you organize the whole process so it feels manageable instead of overwhelming.',
+  },
+  {
+    n: '04',
+    title: 'Get ready for day one',
+    body: "Getting in isn't the finish line. We help you understand what medical school is actually like and prepare you to start — the part that sets us apart from a normal admissions agency.",
   },
 ];
 
-// Packages, browsable like products. "sizes" repurposed as package tiers.
-export const PRODUCTS = [
-  {
-    id: 'application-review',
-    name: 'Application Review',
-    price: 450,
-    cat: 'application-review',
-    drop: 'mentorship',
-    sizes: ['Single Review', '3-Round Review'],
-    sizeLabel: 'Package',
-    desc: 'Line-by-line feedback on your personal statement and application from a doctor who has sat on an admissions committee.',
-    imgs: ['', ''],
-  },
-  {
-    id: 'interview-coaching',
-    name: 'Interview Coaching',
-    price: 600,
-    cat: 'interview-coaching',
-    drop: 'mentorship',
-    sizes: ['1 Session', '3 Sessions', '6 Sessions'],
-    sizeLabel: 'Sessions',
-    desc: 'Mock interviews and real-time feedback from doctors who conduct admissions interviews.',
-    imgs: ['', ''],
-  },
-  {
-    id: 'exam-prep-track',
-    name: 'Entrance Exam Prep Track',
-    price: 1800,
-    cat: 'exam-prep',
-    drop: 'mentorship',
-    sizes: ['Monthly', '3-Month Track'],
-    sizeLabel: 'Plan',
-    desc: 'Ongoing 1:1 mentorship through your entrance exam prep, paired with a doctor-mentor for the full track.',
-    imgs: ['', ''],
-  },
-];
-
-export const PAGES = {
-  'about': {
-    title: 'About Doc. to Doc.',
-    body: [
-      'Doc. to Doc. pairs medical school applicants with practicing doctors who were once applicants themselves.',
-      'Every mentor on our team has been through the application, the interview, and the exam you are preparing for now — and remembers exactly what it felt like.',
-      "We don't just review your application. We tell you what an admissions committee actually sees when they read it.",
-    ],
-  },
-  'privacy-policy': {
-    title: 'Privacy Policy',
-    body: [
-      'We collect only the contact details you give us — name, phone, and email — to get back to you about mentorship, and, if you create an account, the details on that form.',
-      'Passwords are stored as a one-way hash, never in plain text. If you sign in with Google, we never see or store your Google password.',
-      'We never sell or share your information with third parties.',
-    ],
+export const HOW_IT_WORKS = {
+  headline: ['We make the confusing part', 'less confusing.'],
+  quote: {
+    kicker: 'WHY DOC. TO DOC.',
+    text: 'Google can tell you the entry requirements. We can tell you what the next six years actually feel like.',
   },
 };
 
-export const SIZE_GUIDE = { enabled: false, tables: [] };
-
-export const IG_POSTS = [];
-
-export const FEATURES = {
-  cart: true,                          // browse packages, "add to bag"
-  cartDrawer: true,
-  checkout: false,                     // false -> WhatsApp handoff = fast inquiry, no payment collected
-  search: true,
-  giftCard: false,
-  drops: true,                         // powers the Home hero
-  instagram: false,                    // no IG content yet — flip on with real posts
-  newsletter: true,                    // secondary low-friction capture: "stay updated"
-  accounts: true,                      // /signup — email+password, or Google if KEYS.googleClientId is set
-  wishlist: false,
-  notifyWhenAvailable: false,
-  stickyHeader: true,
+// Who We Are — real team from the brief. Photos intentionally blank until
+// the real ones are dropped into assets/ (client has them, tone just needs
+// a light edit per the brief).
+export const TEAM = {
+  headline: 'founded by doctors and medical students who exactly know where you are right now.',
+  intro: 'We were in your shoes not long ago.',
+  body: "We've lived the applications, the doubts, the interviews, the excitement, the homesickness, the all-nighters, the exams, the mistakes — and everything in between. Now we're here to make your journey a whole lot smoother (and a lot less stressful).",
+  groupPhoto: '',
+  members: [
+    {
+      name: 'Gal Yahav',
+      country: 'Israel',
+      role: 'Final year medical student',
+      quote: 'I color-code my notes and my life.',
+      bio: "The planner of the group and probably the one who made the spreadsheets you'll secretly fall in love with.",
+      tag: 'Runs on coffee, curiosity and Spotify.',
+      photo: '',
+    },
+    {
+      name: 'Virginia Pincelli',
+      country: 'Italy',
+      role: 'Doctor',
+      quote: 'I overpack. Always.',
+      bio: 'The organized one with a soft spot for stationery and people. Will hype you up when you need it most.',
+      tag: 'Collects passport stamps and inside jokes.',
+      photo: '',
+    },
+    {
+      name: 'Andrea Pereira',
+      country: 'India',
+      role: 'Doctor',
+      quote: 'I pretend to study. Then I do.',
+      bio: 'Calm, practical and always two steps ahead. Knows the system inside out (and the shortcuts too).',
+      tag: 'Can solve (almost) anything with logic.',
+      photo: '',
+    },
+    {
+      name: 'Ishit Karadikar',
+      country: 'India',
+      role: 'Doctor',
+      quote: 'Probably thinking about food.',
+      bio: 'The realist with the kindest heart. Will tell you the truth — and then make you laugh about it.',
+      tag: 'Professional overthinker and snack enthusiast.',
+      photo: '',
+    },
+  ],
 };
 
+// FAQ — the four questions from the brief's mockup, plus one pushing the
+// free-call idea (the brief explicitly asked to push that harder). Answers
+// are a first draft — review before publishing, especially the admissions
+// one: never overpromise a guarantee.
+export const FAQ = [
+  {
+    q: 'What happens on the free 15-minute call?',
+    a: "It's a real conversation, not a sales pitch. You tell us where you're at — your goals, your grades, what's confusing you — and we explain honestly whether and how we can help. No obligation to continue afterward.",
+  },
+  {
+    q: 'Which European countries do you help with?',
+    a: 'We work across the main European destinations for international medical students. Which ones make sense for you depends on your grades, budget, and entrance-exam options — that\'s exactly what we cover on your call.',
+  },
+  {
+    q: 'Do you guarantee admission?',
+    a: "No one ethically can, and we won't pretend otherwise. What we do guarantee is that you'll apply with a strategy, real information about each school, and a doctor in your corner the whole way — not a generic checklist.",
+  },
+  {
+    q: 'Is this only for students?',
+    a: "Not at all. We work with students directly and with parents who want to understand the process before their kid dives in. The consultation form asks which one you are so we can pitch the conversation right.",
+  },
+  {
+    q: 'Can you help after I get accepted?',
+    a: "Yes — that's a deliberate part of the service. Getting in is not the finish line for us. We help you understand what medical school is actually like and get ready for day one.",
+  },
+];
+
+// Testimonials — none collected yet ("we need to ask people to get some",
+// per the brief). Ship the page with an honest empty state rather than
+// fabricated quotes; fill this array in once real reviews come in.
+export const TESTIMONIALS = [];
+
+// Book a Consultation. Calendly (or Cal.com) embed URL — leave blank until
+// a real scheduling account exists; the page falls back to the intake form
+// alone (posts to /api/contact) so leads are never lost in the meantime.
 export const KEYS = {
-  paymentProvider: '',
-  publicKey: '',
-  newsletterEndpoint: '',
-  analyticsId: '',
-  metaPixelId: '',
-  // Google Cloud project "Doc to Doc" (doc-to-doc-505018), OAuth client
-  // "doc-to-doc web". Authorized JavaScript origin so far: localhost:5173
-  // only — add the production domain in Google Cloud Console (APIs &
-  // Services > Credentials) once one exists, or the button will fail there.
-  googleClientId: '53594060256-09h5n96tfmaqk4ejoldkv1rm8hjq8lff.apps.googleusercontent.com',
+  calendlyUrl: '',          // TODO: paste the Calendly/Cal.com scheduling page URL
 };

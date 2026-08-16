@@ -1,52 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BRAND, CATEGORIES, FEATURES, PAGES, SIZE_GUIDE } from '@client/config';
-import Newsletter from './Newsletter.jsx';
-
-const ext = (href, label) =>
-  href ? (
-    <a className="quiet" href={href} target="_blank" rel="noreferrer">{label}</a>
-  ) : null;
+import { BRAND, NAV } from '@client/config';
 
 export default function Footer() {
-  const page = (slug, label) =>
-    PAGES[slug] ? <Link className="quiet" to={`/p/${slug}`}>{label || PAGES[slug].title}</Link> : null;
-
   return (
     <footer className="footer">
       <div className="footer-inner">
-        <div className="footer-col">
-          <h2>{BRAND.name}</h2>
+        <div className="footer-col footer-col-wide">
+          <img src={BRAND.logo} alt={BRAND.name} className="footer-logo" />
           {BRAND.footerLine && <p className="footer-line">{BRAND.footerLine}</p>}
-          <div className="social-row">
-            {ext(BRAND.igUrl, 'Instagram')}
-            {ext(BRAND.tiktokUrl, 'TikTok')}
-          </div>
         </div>
-        <nav className="footer-col" aria-label="Shop">
-          <h3>Shop</h3>
-          <Link className="quiet" to="/shop">All products</Link>
-          {CATEGORIES.map((c) => (
-            <Link key={c.id} className="quiet" to={`/shop/${c.id}`}>{c.label}</Link>
+        <nav className="footer-col" aria-label="Site">
+          <h3>Site</h3>
+          {NAV.map((item) => (
+            <Link key={item.to} className="quiet" to={item.to}>{item.label}</Link>
           ))}
-          {FEATURES.giftCard && <Link className="quiet" to="/gift-card">Gift card</Link>}
         </nav>
-        <nav className="footer-col" aria-label="Help">
-          <h3>Help</h3>
-          {SIZE_GUIDE.enabled && <Link className="quiet" to="/size-guide">Size guide</Link>}
-          {page('shipping-returns')}
-          {page('store-policy')}
-          <Link className="quiet" to="/contact">Contact us</Link>
+        <nav className="footer-col" aria-label="Get in touch">
+          <h3>Get in touch</h3>
+          <Link className="quiet" to="/book">Talk to a Doc.</Link>
+          {BRAND.email && <a className="quiet" href={`mailto:${BRAND.email}`}>{BRAND.email}</a>}
+          {BRAND.igUrl && <a className="quiet" href={BRAND.igUrl} target="_blank" rel="noreferrer">Instagram</a>}
         </nav>
-        <nav className="footer-col" aria-label="Brand">
-          <h3>Brand</h3>
-          {page('about')}
-          {FEATURES.drops && <Link className="quiet" to="/drops">Drops</Link>}
-          {page('privacy-policy')}
-        </nav>
-        <div className="footer-col">
-          {FEATURES.newsletter && <Newsletter />}
-        </div>
       </div>
     </footer>
   );

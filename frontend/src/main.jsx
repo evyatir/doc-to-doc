@@ -3,10 +3,8 @@ import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { css } from './styles.js';
 import { cssVars, loadFonts } from './theme.js';
-import { validateConfig } from './validate.js';
 
 loadFonts();
-validateConfig();
 
 const style = document.createElement('style');
 style.textContent = css;
