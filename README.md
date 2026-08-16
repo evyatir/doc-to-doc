@@ -33,7 +33,7 @@ npm run dev:all         # frontend :5173 + API :3001 together (dev proxy wires /
 | `/who-we-are` | Team bios (Gal, Virginia, Andrea, Ishit) — real names/quotes from the brief |
 | `/faq` | Accordion FAQ, pushes the free 15-minute call per the brief's note |
 | `/testimonials` | Honest empty state — no reviews collected yet; ships with a `TESTIMONIALS` array in config ready to fill in |
-| `/book` | The core page: intake form (name, email, student/parent, stage, notes) + a Calendly/Cal.com embed slot |
+| `/book` | The core page: an emotional hook + one "Book a Consultation" button that toggles open the intake form (name, email, student/parent, stage, notes) + a Calendly/Cal.com embed slot — matches the brief's "toggle for consultation" wording |
 | `/admin` | Not linked publicly — password-protected list of everyone who submitted the `/book` form |
 
 ## Config (`clients/doc-to-doc/config.js`)
@@ -94,10 +94,24 @@ npm run dev:all
 - Single container works: when `frontend/dist` exists, `backend/index.js`
   serves it directly (see `Dockerfile` / `deploy/`).
 - Set `VITE_API_URL` if the frontend and API are on different origins.
+- `POST /api/contact` is rate-limited (5 submissions / 10 minutes / IP,
+  in-memory) and has a client-side honeypot field against basic bots.
+  `app.set('trust proxy', 1)` is set so the limiter sees the real visitor IP
+  behind a reverse-proxy deploy (Render/Coolify/etc.) — if you front this
+  with more than one proxy hop, adjust that value.
 - No payments and no customer accounts on this site — the trust surface is
-  much smaller than a storefront's. The one open item worth doing before
-  heavy traffic: basic rate limiting on `POST /api/contact` (unthrottled
-  right now).
+  much smaller than a storefront's.
+- **Not yet deployed anywhere persistent.** Everything above has been
+  verified against a real (throwaway, local) Postgres instance — migrations,
+  the intake form, rate limiting, and the admin leads view all work
+  end-to-end. But there is no live database or hosted API right now, so
+  `/book` on the public GitHub Pages demo runs in degraded mode: the form
+  shows success but nothing is recorded. To make it real: create a Postgres
+  instance (Neon/Supabase/etc. all have a free tier) and a host for
+  `backend/` (Render, or the VPS+Coolify path in the original backbone's
+  `docs/guides/DEPLOY_VPS.md`) — **I can't create third-party accounts on
+  your behalf**, so this step needs you, then hand me the connection
+  string / point me at the host and I'll wire and verify the rest.
 
 ## Known leftovers (not cleaned up in this pass)
 

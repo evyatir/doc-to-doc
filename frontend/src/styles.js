@@ -62,10 +62,11 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .header-wrap.sticky { position: sticky; top: 0; z-index: 50; }
 .header {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-  gap: 20px; min-height: 88px; padding: 0 24px; max-width: 1400px; margin: 0 auto;
+  gap: 20px; min-height: 104px; padding: 0 24px; max-width: 1400px; margin: 0 auto;
 }
-.brand-logo { display: inline-flex; align-items: center; }
-.brand-logo img { height: 56px; width: auto; }
+.brand-logo { display: inline-flex; align-items: center; transition: opacity var(--t-fade); }
+.brand-logo:hover { opacity: 0.75; }
+.brand-logo img { height: 72px; width: auto; }
 .nav { display: flex; align-items: center; justify-content: center; gap: 26px; flex-wrap: wrap; }
 .navlink {
   font-family: var(--font-display); font-size: var(--fs-nav);
@@ -132,11 +133,20 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .hero-ctas { display: flex; align-items: center; gap: 24px; margin-top: 32px; flex-wrap: wrap; }
 .hero-cta-primary { padding: 14px 28px; }
 .hero-cta-secondary { font-family: var(--font-display); font-size: var(--fs-small); }
-.hero-photo-wrap { position: relative; }
+.hero-photo-wrap { position: relative; padding: 10px; }
 .hero-photo {
-  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r);
-  border: 1px solid var(--muted);
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px;
+  box-shadow: 0 12px 28px -12px rgba(92, 56, 28, 0.35);
 }
+/* washi-tape corners — the scrapbook detail from the client's mockups */
+.hero-photo-wrap::before, .hero-photo-wrap::after,
+.team-photo-wrap::before, .team-photo-wrap::after {
+  content: ''; position: absolute; width: 64px; height: 24px;
+  background: var(--accent); opacity: 0.28; z-index: 2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.hero-photo-wrap::before { top: 0; left: 24px; transform: rotate(-6deg); }
+.hero-photo-wrap::after { bottom: 4px; right: 20px; transform: rotate(5deg); }
 .hero-note {
   position: absolute; bottom: -14px; left: -10px;
   font-family: var(--font-display); font-style: italic; font-size: 15px;
@@ -178,14 +188,24 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 
 /* ---------- who we are ---------- */
 .who-h1 { max-width: 780px; margin: 0 auto 40px; }
-.team-photo-wrap { max-width: 900px; margin: 0 auto; }
-.team-photo { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r); border: 1px solid var(--muted); }
+.team-photo-wrap { max-width: 900px; margin: 0 auto; position: relative; padding: 10px; }
+.team-photo {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 2px;
+  box-shadow: 0 16px 32px -14px rgba(92, 56, 28, 0.35);
+}
+.team-photo-wrap::before { top: -2px; left: 40px; transform: rotate(-5deg); }
+.team-photo-wrap::after { bottom: 2px; right: 36px; transform: rotate(4deg); }
 .who-intro { text-align: center; font-size: var(--fs-h2); margin: 48px auto 0; }
 .who-body { text-align: center; max-width: 68ch; margin: 16px auto 0; color: var(--muted); }
 .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 56px; }
 .team-card {
   border: 1px solid var(--muted); border-radius: var(--r); padding: 20px;
   display: grid; gap: 6px; justify-items: start;
+  transition: transform var(--t-fade), box-shadow var(--t-fade), border-color var(--t-fade);
+}
+.team-card:hover {
+  transform: translateY(-3px); border-color: var(--accent);
+  box-shadow: 0 14px 24px -16px rgba(92, 56, 28, 0.4);
 }
 .team-avatar { width: 64px; height: 64px; border-radius: 999px; object-fit: cover; }
 .team-name { font-size: 17px; margin-top: 10px; }
@@ -209,7 +229,11 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .empty-state { text-align: center; padding: 56px 0; display: grid; gap: 8px; justify-items: center; }
 .empty-state-sub { font-size: 14px; color: var(--muted); }
 .testimonial-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 40px; }
-.testimonial-card { border: 1px solid var(--muted); border-radius: var(--r); padding: 24px; }
+.testimonial-card {
+  border: 1px solid var(--muted); border-radius: var(--r); padding: 24px;
+  transition: transform var(--t-fade), box-shadow var(--t-fade);
+}
+.testimonial-card:hover { transform: translateY(-3px); box-shadow: 0 14px 24px -16px rgba(92, 56, 28, 0.4); }
 .testimonial-quote { font-family: var(--font-display); font-style: italic; font-size: 17px; }
 .testimonial-author { font-size: 13px; color: var(--muted); margin-top: 12px; }
 
@@ -234,7 +258,16 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .role-btn.selected { background: var(--ink); color: var(--paper); }
 
 /* ---------- book a consultation ---------- */
-.book-page { max-width: 1200px; }
+.book-page { max-width: 1200px; margin: 0 auto; }
+.book-hook {
+  text-align: center; max-width: 640px; margin: 0 auto;
+  padding: 88px 24px 64px;
+}
+.book-hook-sub { color: var(--muted); font-size: 18px; margin-top: 14px; }
+.book-hook-btn { margin-top: 32px; padding: 14px 32px; }
+.book-reveal { animation: book-reveal 0.35s ease both; padding-top: 16px; }
+@keyframes book-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .book-hero { text-align: center; max-width: 640px; margin: 0 auto; }
 .book-hero-note { font-family: var(--font-display); font-style: italic; color: var(--accent); font-size: 14px; }
 .book-h1 { margin-top: 12px; }
@@ -317,6 +350,8 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .quiet, .navlink, .icon-btn, .btn, .blur-img, .mobile-menu { transition: none; }
+  .quiet, .navlink, .icon-btn, .btn, .blur-img, .mobile-menu, .brand-logo,
+  .team-card, .testimonial-card { transition: none; }
+  .book-reveal { animation: none; }
 }
 `;

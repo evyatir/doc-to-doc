@@ -6,6 +6,27 @@ import { fetchProducts } from '../queries.js';
 
 const router = Router();
 
+// Minimal in-memory rate limit: 5 submissions per 10 minutes per IP. No new
+// dependency, no shared state needed — this is a single-instance deploy, and
+// the intake form is the one unauthenticated write worth throttling (it was
+// a documented, unfixed gap). Resets on restart; that's fine for its purpose
+// (stopping a script from hammering the form, not perfect abuse prevention).
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const hits = new Map(); // ip -> [timestamps]
+
+function rateLimit(req, res, next) {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT_MAX) {
+    return res.status(429).json({ error: 'Too many requests — try again in a few minutes' });
+  }
+  recent.push(now);
+  hits.set(ip, recent);
+  next();
+}
+
 // zod parse -> 400 { error, fields } on failure, null on success (response sent).
 function parseBody(schema, req, res) {
   const result = schema.safeParse(req.body);
@@ -142,7 +163,7 @@ const contactSchema = z.object({
   message: z.string().trim().max(5000).optional().or(z.literal('')),
 });
 
-router.post('/contact', async (req, res, next) => {
+router.post('/contact', rateLimit, async (req, res, next) => {
   const body = parseBody(contactSchema, req, res);
   if (!body) return;
   try {

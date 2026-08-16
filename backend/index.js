@@ -15,6 +15,12 @@ import adminRoutes from './routes/admin.js';
 
 const app = express();
 
+// Trust one hop of proxy (Render/Coolify/any reverse-proxy deploy) so
+// req.ip is the visitor's real address, not the proxy's — the /api/contact
+// rate limiter is per-IP and useless if every request looks like it came
+// from the same load balancer.
+app.set('trust proxy', 1);
+
 // CORS_ORIGIN empty = same-origin only (dev proxy needs no CORS headers).
 if (process.env.CORS_ORIGIN) {
   app.use(cors({ origin: process.env.CORS_ORIGIN.split(',').map((s) => s.trim()) }));

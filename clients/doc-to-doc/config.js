@@ -67,6 +67,16 @@ export const HERO = {
   photoCaption: 'future doc. ↓',
 };
 
+// Book a Consultation — the brief describes this page as an emotional hook
+// with a single button that opens ("the toggle for") the actual intake form
+// + calendar. BOOK is the hook; the toggled section's copy lives inline in
+// BookConsultation.jsx since it's mockup-exact ("Let's start with 15 minutes").
+export const BOOK = {
+  headline: ["Your medical journey doesn't start", 'on your first day of medical school.'],
+  sub: "It starts with knowing where you're going.",
+  cta: 'Book a Consultation',
+};
+
 // The "in-between" quote section from the brief — sits between the hero
 // area and the deeper pages, doesn't have its own nav item.
 export const REASSURANCE = {

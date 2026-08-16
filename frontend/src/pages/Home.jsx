@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BRAND, HERO, REASSURANCE, STEPS, HOW_IT_WORKS } from '@client/config';
+import { BRAND, HERO, REASSURANCE, STEPS, HOW_IT_WORKS, BOOK } from '@client/config';
 import { useSeo } from '../seo.js';
 import Img from '../components/Img.jsx';
 
@@ -69,9 +69,11 @@ export default function Home() {
       </section>
 
       <section className="final-cta">
-        <h2 className="section-h2">Your medical journey doesn't start on your first day of medical school.</h2>
-        <p className="final-cta-sub">It starts with knowing where you're going.</p>
-        <Link to="/book" className="btn btn-commerce final-cta-btn">Book a Consultation</Link>
+        <h2 className="section-h2">
+          {BOOK.headline.map((line, i) => <span key={i}>{line}<br /></span>)}
+        </h2>
+        <p className="final-cta-sub">{BOOK.sub}</p>
+        <Link to="/book" className="btn btn-commerce final-cta-btn">{BOOK.cta}</Link>
       </section>
     </main>
   );
