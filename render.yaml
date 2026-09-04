@@ -1,0 +1,31 @@
+# Render Blueprint for the Doc. to Doc. API.
+# Render → New → Blueprint → pick this repo. Everything below is set for you;
+# only the two marked `sync: false` values are typed in by hand.
+services:
+  - type: web
+    name: doc-to-doc-api
+    runtime: node
+    plan: free
+    region: frankfurt          # closest region to Israel/Europe applicants
+    branch: master
+    buildCommand: npm ci
+    startCommand: node backend/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATABASE_SSL
+        value: auto
+      - key: STORAGE_PROVIDER
+        value: local
+      # The GitHub Pages front-end origin. Add the real domain here too, comma
+      # separated, once BRAND.domain is picked.
+      - key: CORS_ORIGIN
+        value: https://evyatir.github.io
+      # Paste these two in the Render dashboard — never commit them.
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
