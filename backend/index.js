@@ -1,4 +1,4 @@
-// Storefront API server. Boots with an EMPTY .env: without DATABASE_URL it
+// Doc. to Doc. API server. Boots with an EMPTY .env: without DATABASE_URL it
 // runs degraded — health reports db:false and the gate below turns every data
 // route into an honest 503 (the frontend's signal to fall back to config
 // products). That gate is the ONLY code path that branches on the database.
