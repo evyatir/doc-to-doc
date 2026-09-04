@@ -1,0 +1,64 @@
+# Build the site and publish it to the gh-pages branch on every push to master.
+#
+# Why a branch push and not the official Pages actions: this repo's Pages
+# source is already the gh-pages branch. Publishing the same way the manual
+# deploys did means the workflow can be adopted (or abandoned) without
+# touching repository settings, and the live site never depends on a Pages
+# source migration going right.
+name: Deploy site
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Never let two deploys race each other onto gh-pages.
+concurrency:
+  group: deploy-gh-pages
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          # GH_PAGES sets Vite's base to /doc-to-doc/ (see vite.config.js).
+          GH_PAGES: 'true'
+          # The hosted API. Override by setting the VITE_API_URL repository
+          # variable (Settings -> Secrets and variables -> Actions -> Variables).
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://doc-to-doc-api.onrender.com' }}
+        run: npm run build
+
+      - name: SPA fallback
+        # GitHub Pages serves 404.html for unknown paths; the router takes it
+        # from there, so deep links like /doc-to-doc/faq work on a hard load.
+        run: cp frontend/dist/index.html frontend/dist/404.html
+
+      - name: Publish to gh-pages
+        run: |
+          set -euo pipefail
+          cd frontend/dist
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7}: ${COMMIT_SUBJECT}"
+          git push -q --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            HEAD:gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_SUBJECT: ${{ github.event.head_commit.message }}
