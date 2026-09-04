@@ -25,13 +25,17 @@ export const BRAND = {
 
 export const THEME = {
   // ---- colors, the client's exact palette ----
-  band: '#FFF5E0',        // header/footer background — same as paper, no dark band
-  paper: '#FFF5E0',       // cream page background
+  band: '#FFFFFF',        // header/footer background — same as paper, no dark band
+  paper: '#FFFFFF',       // white page background (client request, 2026-09-04)
   ink: '#5C381C',         // dark brown — body text, headlines
   inkOnBand: '#5C381C',   // header/footer text (band === paper here)
   accent: '#A63C06',      // rust — CTAs, step numbers, links
   muted: '#8C6F53',       // derived mid-brown for secondary text (not in the swatch, chosen to sit between ink and paper)
   focus: '#679436',       // sage green — focus rings, ties back to the logo's green
+  green: '#679436',       // the logo's green, for text on the white page
+  greenOnDark: '#8CBF5B', // lighter tint of the same green, for the dark brown band
+                          // (#679436 on #5C381C is only 2.9:1 — unreadable)
+  terracotta: '#C65F45',  // fourth swatch from the client's palette — accents/details
 
   displayFont: 'Playfair Display',   // headlines — matches the brief's serif mockups
   bodyFont: 'Lora',
@@ -54,17 +58,18 @@ export const NAV = [
   { to: '/testimonials', label: 'What they say about us' },
 ];
 
-// Hero. Photo is intentionally blank — the brief says the current image is
-// only a placeholder ("we want a real photograph of us studying together").
-// Swap in clients/doc-to-doc/assets/ once that photo exists.
+// Hero. The client asked (2026-09-04) to show the logo on the right instead
+// of a photo. Set `photoIsLogo: false` and point `photo` at a real image in
+// clients/doc-to-doc/assets/ when the studying-together photograph exists.
 export const HERO = {
   eyebrow: 'real doctors · real med-school experience · zero corporate nonsense',
   headline: ['So, you want to', 'become a doctor?'],
   body: "Good. We know a few things about that. We went from applicants to med students to doctors — now we help future doctors choose the right school, apply smarter, and know what they're actually signing up for.",
   ctaPrimary: { label: "LET'S GET YOU INTO MED SCHOOL", href: '/book' },
   ctaSecondary: { label: 'See how it works', href: '/how-it-works' },
-  photo: '',
-  photoCaption: 'future doc. ↓',
+  photo: new URL('./assets/logo.png', import.meta.url).href,
+  photoIsLogo: true,
+  photoCaption: '',
 };
 
 // Book a Consultation — the brief describes this page as an emotional hook

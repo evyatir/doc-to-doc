@@ -11,6 +11,9 @@ const DEFAULTS = {
   accent: '#7FB850',
   muted: '#444444',
   focus: '#116DFF',
+  green: '',
+  greenOnDark: '',
+  terracotta: '',
   displayFont: '',
   bodyFont: '',
   accentFont: '',
@@ -39,6 +42,11 @@ export function cssVars() {
     '--accent': t.accent,
     '--muted': t.muted,
     '--focus': t.focus,
+    // Optional palette extras: fall back to accent so a client that doesn't
+    // define them keeps a working (if monochrome) page.
+    '--green': t.green || t.accent,
+    '--green-on-dark': t.greenOnDark || t.green || t.accent,
+    '--terracotta': t.terracotta || t.accent,
     '--font-display': fontStack(t.displayFont, 'sans-serif'),
     '--font-body': fontStack(t.bodyFont, 'sans-serif'),
     '--font-accent': fontStack(t.accentFont || t.displayFont, 'sans-serif'),

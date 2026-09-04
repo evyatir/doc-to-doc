@@ -27,8 +27,13 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className="hero-photo-wrap">
-          <Img className="hero-photo" src={HERO.photo} alt="" label="Studying together" />
+        <div className={`hero-photo-wrap${HERO.photoIsLogo ? ' is-logo' : ''}`}>
+          <Img
+            className={`hero-photo${HERO.photoIsLogo ? ' hero-photo-logo' : ''}`}
+            src={HERO.photo}
+            alt={HERO.photoIsLogo ? `${BRAND.name} logo` : ''}
+            label="Studying together"
+          />
           {HERO.photoCaption && <p className="hero-note">{HERO.photoCaption}</p>}
         </div>
       </section>

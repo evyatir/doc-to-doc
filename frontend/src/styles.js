@@ -138,11 +138,18 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
   width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px;
   box-shadow: 0 12px 28px -12px rgba(92, 56, 28, 0.35);
 }
+/* Logo-in-the-hero variant: the logo sits directly on the white page — no
+   card, no photo crop, no washi tape. Client request, 2026-09-04. */
+.hero-photo-logo {
+  object-fit: contain; padding: 4%; background: var(--paper);
+  border-radius: 0; box-shadow: none;
+}
+.hero-photo-wrap.is-logo::before, .hero-photo-wrap.is-logo::after { content: none; }
 /* washi-tape corners — the scrapbook detail from the client's mockups */
 .hero-photo-wrap::before, .hero-photo-wrap::after,
 .team-photo-wrap::before, .team-photo-wrap::after {
   content: ''; position: absolute; width: 64px; height: 24px;
-  background: var(--accent); opacity: 0.28; z-index: 2;
+  background: var(--terracotta); opacity: 0.32; z-index: 2;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .hero-photo-wrap::before { top: 0; left: 24px; transform: rotate(-6deg); }
@@ -150,7 +157,7 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .hero-note {
   position: absolute; bottom: -14px; left: -10px;
   font-family: var(--font-display); font-style: italic; font-size: 15px;
-  color: var(--accent); transform: rotate(-4deg);
+  color: var(--terracotta); transform: rotate(-4deg);
 }
 
 /* ---------- reassurance / quote band ---------- */
@@ -159,7 +166,7 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .quote-question { font-family: var(--font-display); font-size: 21px; opacity: 0.85; }
 .quote-line {
   font-family: var(--font-display); font-style: italic; font-size: var(--fs-h2);
-  color: var(--accent); margin-top: 18px;
+  color: var(--green-on-dark); margin-top: 18px;
 }
 
 /* ---------- steps ---------- */
@@ -167,7 +174,7 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
 .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 16px; text-align: left; }
 .steps-grid-full { margin-top: 8px; }
 .step-card { border-top: 2px solid var(--ink); padding-top: 16px; }
-.step-n { font-family: var(--font-display); font-size: 22px; color: var(--accent); }
+.step-n { font-family: var(--font-display); font-size: 22px; color: var(--green); }
 .step-title { font-size: 19px; margin-top: 10px; }
 .step-body { font-size: 14.5px; color: var(--muted); margin-top: 10px; line-height: 1.55; }
 .steps-cta { display: flex; justify-content: center; margin-top: 40px; }
