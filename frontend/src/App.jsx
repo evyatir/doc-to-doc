@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ToastProvider } from './components/Toast.jsx';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
+import MobileCta from './components/MobileCta.jsx';
 import Home from './pages/Home.jsx';
 import HowItWorks from './pages/HowItWorks.jsx';
 import WhoWeAre from './pages/WhoWeAre.jsx';
@@ -38,6 +39,7 @@ function Layout() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {!isAdmin && <Footer />}
+      {!isAdmin && <MobileCta />}
     </>
   );
 }

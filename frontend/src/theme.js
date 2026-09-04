@@ -30,6 +30,12 @@ const SCALE_NAMES = [
   'pdp-h1', 'card-name', 'nav', 'card-price', 'small',
 ];
 
+// Apple's system font (San Francisco) on Apple devices, each platform's own
+// system UI font elsewhere. Nothing is downloaded — it's already installed.
+const SYSTEM_UI =
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, ' +
+  '"Helvetica Neue", Arial, sans-serif';
+
 const fontStack = (name, generic) => (name ? `"${name}", ${generic}` : generic);
 
 export function cssVars() {
@@ -47,9 +53,9 @@ export function cssVars() {
     '--green': t.green || t.accent,
     '--green-on-dark': t.greenOnDark || t.green || t.accent,
     '--terracotta': t.terracotta || t.accent,
-    '--font-display': fontStack(t.displayFont, 'sans-serif'),
-    '--font-body': fontStack(t.bodyFont, 'sans-serif'),
-    '--font-accent': fontStack(t.accentFont || t.displayFont, 'sans-serif'),
+    '--font-display': fontStack(t.displayFont, SYSTEM_UI),
+    '--font-body': fontStack(t.bodyFont, SYSTEM_UI),
+    '--font-accent': fontStack(t.accentFont || t.displayFont, SYSTEM_UI),
     '--r-commerce': t.commerceRadius,
     '--r': t.radius,
     '--t-fade': t.motion.fade,

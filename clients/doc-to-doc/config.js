@@ -37,8 +37,12 @@ export const THEME = {
                           // (#679436 on #5C381C is only 2.9:1 — unreadable)
   terracotta: '#C65F45',  // fourth swatch from the client's palette — accents/details
 
-  displayFont: 'Playfair Display',   // headlines — matches the brief's serif mockups
-  bodyFont: 'Lora',
+  // Blank = the device's own system font: San Francisco on Mac/iPhone, Segoe
+  // UI on Windows, Roboto on Android. Client request, 2026-09-04 ("Apple
+  // font"). Put 'Playfair Display' / 'Lora' back to return to the serif
+  // mockups from the brief.
+  displayFont: '',                   // headlines
+  bodyFont: '',
   accentFont: '',                    // italics applied via CSS, not a second family
 
   commerceRadius: '6px',   // primary CTA buttons — small rectangle, not a pill (per mockup)

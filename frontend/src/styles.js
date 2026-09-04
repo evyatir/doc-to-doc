@@ -100,6 +100,27 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
   color: var(--ink-on-band); min-height: 48px; display: flex; align-items: center;
 }
 .mobile-close { align-self: flex-end; font-size: var(--fs-nav); }
+.mobile-menu-nav { display: flex; flex-direction: column; gap: 4px; }
+.mobile-menu-cta {
+  margin-top: auto; width: 100%; min-height: 52px;
+  font-size: 15px; color: var(--paper);
+  margin-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+
+/* ---------- sticky mobile CTA ----------
+   The header CTA is hidden under the burger on phones, which buries the one
+   action this site exists for. This bar keeps it one thumb-tap away. */
+.mobile-cta { display: none; }
+@media (max-width: 900px) {
+  .mobile-cta {
+    display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: var(--paper); border-top: 1px solid var(--muted);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+  .mobile-cta .btn { width: 100%; min-height: 52px; font-size: 15px; }
+  /* room for the bar so it never covers the last line of the footer */
+  body { padding-bottom: 84px; }
+}
 
 /* ---------- blur-up images ---------- */
 .blur-img { transition: filter var(--t-fade), opacity var(--t-fade); }
@@ -251,9 +272,14 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
   display: block; font-family: var(--font-display); font-size: var(--fs-small); margin-bottom: 6px;
 }
 .field select, .field input, .field textarea {
-  width: 100%; min-height: 44px; padding: 10px 12px;
+  width: 100%; min-height: 48px; padding: 12px 14px;
+  font-family: var(--font-body); font-size: 16px; color: var(--ink);
   border: 1px solid var(--ink); border-radius: var(--r); background: var(--paper);
 }
+/* 16px is the floor: iOS Safari zooms the whole page in when a focused field
+   is smaller, and the visitor then has to pinch back out mid-form. */
+.field textarea { min-height: 120px; line-height: 1.5; }
+.field select { appearance: none; -webkit-appearance: none; background-image: none; }
 .field select.placeholder-opt { color: var(--muted); }
 .err { color: #B33A3A; font-size: 13px; margin-top: 4px; }
 .ok-note { font-family: var(--font-display); font-size: 17px; padding: 24px 0; }
@@ -345,14 +371,52 @@ input, textarea, select { font-family: var(--font-body); font-size: 16px; color:
   .brand-logo img { height: 44px; }
   .header-cta { display: none; }
 }
+/* ---------- phones ----------
+   The desktop scale tops out at 64px, which on a 390px screen puts three
+   words on three lines. Fluid sizes below keep the same hierarchy at a
+   readable size from 320px up. */
+@media (max-width: 900px) {
+  :root {
+    --fs-hero-xl: clamp(32px, 8.5vw, 48px);
+    --fs-hero-lg: clamp(28px, 7.5vw, 40px);
+    --fs-h2: clamp(24px, 6.5vw, 32px);
+    --fs-category-h1: clamp(24px, 6.5vw, 30px);
+    --fs-newsletter: clamp(22px, 6vw, 28px);
+    --fs-pdp-h1: clamp(22px, 6vw, 26px);
+  }
+  .hero { padding: 32px 20px 24px; gap: 24px; }
+  .hero-body { font-size: 16px; margin-top: 16px; }
+  .hero-ctas { gap: 16px; margin-top: 24px; }
+  .hero-cta-primary { width: 100%; }
+  .hero-eyebrow { font-size: 11px; margin-bottom: 12px; }
+  /* the logo is decorative here — don't let it eat a whole screen */
+  .hero-photo-logo { max-width: 300px; margin: 0 auto; display: block; padding: 0; }
+  .quote-band { padding: 40px 20px; }
+  .quote-question { font-size: 17px; }
+  .steps-teaser { padding: 48px 20px 0; }
+  .why-band { margin-top: 48px; }
+  /* portrait photos survive 4/3 on a narrow screen; 16/9 slices heads off */
+  .team-photo { aspect-ratio: 4 / 3; }
+  .team-photo-wrap { padding: 6px; }
+  .book-hook { padding: 48px 20px 40px; }
+  .book-hook-sub { font-size: 16px; }
+  .book-hook-btn { width: 100%; }
+  .book-split { margin-top: 32px; }
+  .book-form-card, .book-calendar-card { padding: 20px; }
+  .acc-head { font-size: 16px; min-height: 52px; gap: 16px; }
+  .footer { margin-top: 56px; }
+}
 @media (max-width: 640px) {
   .steps-grid { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: 1fr; }
   .testimonial-grid { grid-template-columns: 1fr; }
   .footer-inner { grid-template-columns: 1fr; }
   .page { padding: 40px 16px 72px; }
-  .book-chips { gap: 16px; flex-wrap: wrap; }
+  .book-chips { gap: 12px 16px; flex-wrap: wrap; }
   .role-toggle { flex-direction: column; }
+  .steps-cta .btn, .form-grid .btn-commerce { width: 100%; }
+  .team-card, .testimonial-card { padding: 18px; }
+  .quote-band-inner { gap: 8px; }
 }
 
 /* ---------- reduced motion ---------- */

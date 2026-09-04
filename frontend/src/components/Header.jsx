@@ -1,6 +1,6 @@
 // Simple marketing-site header: logo left, nav + one CTA right. No cart, no
 // search, no accounts — this site converts on booking a call, not buying.
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { BRAND, NAV } from '@client/config';
 import { useFocusTrap } from './focusTrap.js';
@@ -45,13 +45,28 @@ export default function Header() {
 
 function MobileMenu({ onClose }) {
   const ref = useFocusTrap(true, onClose);
+
+  // Freeze the page behind the overlay. Without this the background scrolls
+  // under your finger on iOS and the menu feels broken.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   return (
     <div className="mobile-menu" ref={ref} role="dialog" aria-modal="true" aria-label="Menu">
       <button className="mobile-close quiet" onClick={onClose} aria-label="Close menu">Close ✕</button>
-      {NAV.map((item) => (
-        <Link key={item.to} to={item.to} onClick={onClose} className="quiet">{item.label}</Link>
-      ))}
-      <Link to="/book" onClick={onClose} className="quiet">Talk to a Doc.</Link>
+      <nav className="mobile-menu-nav" aria-label="Main">
+        {NAV.map((item) => (
+          <Link key={item.to} to={item.to} onClick={onClose} className="quiet">{item.label}</Link>
+        ))}
+      </nav>
+      {/* The booking link is the one action here — it should not look like
+          another nav item. */}
+      <Link to="/book" onClick={onClose} className="btn btn-commerce mobile-menu-cta">
+        Talk to a Doc.
+      </Link>
     </div>
   );
 }
