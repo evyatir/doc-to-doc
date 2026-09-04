@@ -135,7 +135,9 @@ export const TEAM = {
   headline: 'founded by doctors and medical students who exactly know where you are right now.',
   intro: 'We were in your shoes not long ago.',
   body: "We've lived the applications, the doubts, the interviews, the excitement, the homesickness, the all-nighters, the exams, the mistakes — and everything in between. Now we're here to make your journey a whole lot smoother (and a lot less stressful).",
-  groupPhoto: '',
+  // Top-of-page photo. Virginia's portrait for now (client request,
+  // 2026-09-04) — swap for a real group photograph when one exists.
+  groupPhoto: new URL('./assets/virginia.jpg', import.meta.url).href,
   members: [
     {
       name: 'Gal Yahav',
@@ -144,7 +146,7 @@ export const TEAM = {
       quote: 'I color-code my notes and my life.',
       bio: "The planner of the group and probably the one who made the spreadsheets you'll secretly fall in love with.",
       tag: 'Runs on coffee, curiosity and Spotify.',
-      photo: '',
+      photo: new URL('./assets/gal-avatar.jpg', import.meta.url).href,
     },
     {
       name: 'Virginia Pincelli',
@@ -153,7 +155,7 @@ export const TEAM = {
       quote: 'I overpack. Always.',
       bio: 'The organized one with a soft spot for stationery and people. Will hype you up when you need it most.',
       tag: 'Collects passport stamps and inside jokes.',
-      photo: '',
+      photo: new URL('./assets/virginia-avatar.jpg', import.meta.url).href,
     },
     {
       name: 'Andrea Pereira',
