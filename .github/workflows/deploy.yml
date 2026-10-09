@@ -45,7 +45,11 @@ jobs:
       - name: SPA fallback
         # GitHub Pages serves 404.html for unknown paths; the router takes it
         # from there, so deep links like /admin work on a hard load.
-        run: cp frontend/dist/index.html frontend/dist/404.html
+        # /privacy also gets its own copy so it answers 200, not 404.
+        run: |
+          cp frontend/dist/index.html frontend/dist/404.html
+          mkdir -p frontend/dist/privacy
+          cp frontend/dist/index.html frontend/dist/privacy/index.html
 
       - name: Publish to gh-pages
         run: |

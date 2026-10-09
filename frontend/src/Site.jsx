@@ -7,7 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
-import Consent from './Consent.jsx';
+import Consent, { openConsent } from './Consent.jsx';
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -358,6 +358,11 @@ export default function Site() {
           <div className="footer-bottom">
             <span>© {new Date().getFullYear()} Doc. to Doc.</span>
             <span>Personal guidance. Firsthand experience.</span>
+            <span className="footer-legal">
+              <a href={`${import.meta.env.BASE_URL}privacy`}>Privacy policy</a>
+              {' · '}
+              <button type="button" onClick={openConsent} style={{ background: 'none', border: 0, padding: 0, font: 'inherit', color: 'inherit', cursor: 'pointer' }}>Cookie settings</button>
+            </span>
           </div>
         </div>
       </footer>
