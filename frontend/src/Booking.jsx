@@ -1,12 +1,13 @@
-// Booking design preview (branch booking-designs) — three ways to let a lead
-// pick a free 30-minute Zoom call instead of writing an email. The slots are
-// FAKE: generated locally, nothing is booked. Once a design is chosen, the
-// picker is replaced by the real Cal.com embed (Google Calendar availability
-// + Zoom link + invite to both sides), styled the same way.
+// Booking designs (branch booking-designs) — three ways to let a lead pick a
+// free 30-minute Zoom call instead of writing an email. Slots and bookings go
+// through cal.js: real Cal.com when VITE_CAL_USERNAME is set, fake otherwise.
 //
 // Pick a design with ?design=a|b|c; a small switcher bar is shown for review.
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
+import { getSlots, book, LIVE, TIME_ZONE as TZ } from './cal.js';
+
+const EMAIL = 'Doctodocmentors@gmail.com';
 
 export const DESIGNS = {
   a: { name: 'Pop-up', blurb: 'Button opens a calendar window' },
@@ -44,65 +45,87 @@ export function BookingProvider({ children }) {
   );
 }
 
-// Next 10 weekdays, four fake slots each, a few marked taken.
+// Loads free slots once per mount. { days, error } — days null while loading.
 function useSlots() {
-  return useMemo(() => {
-    const days = [];
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    while (days.length < 10) {
-      d.setDate(d.getDate() + 1);
-      if (d.getDay() === 0 || d.getDay() === 6) continue;
-      const times = [10, 13, 17, 19]
-        .filter((h, i) => (d.getDate() + i) % 3 !== 0)
-        .map((h) => { const t = new Date(d); t.setHours(h, (h === 13 ? 30 : 0)); return t; });
-      days.push({ date: new Date(d), times });
-    }
-    return days;
+  const [state, setState] = useState({ days: null, error: false });
+  useEffect(() => {
+    let live = true;
+    getSlots().then(
+      (days) => live && setState({ days, error: false }),
+      () => live && setState({ days: [], error: true }),
+    );
+    return () => { live = false; };
   }, []);
+  return state;
+}
+
+function SlotsFallback({ error }) {
+  return (
+    <p className="bk-muted">
+      {error ? 'We couldn’t load the calendar right now.' : 'No free times in the next few weeks.'}{' '}
+      <a className="bk-link" href={`mailto:${EMAIL}`}>Email us</a> and we’ll find a time together.
+    </p>
+  );
 }
 
 const fmtDay = (d) => d.toLocaleDateString('en-GB', { weekday: 'short' });
 const fmtNum = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const fmtTime = (d) => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 const fmtFull = (d) => d.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
-const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 function DetailsForm({ slot, onBack, onDone }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const submit = async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    setBusy(true);
+    setError('');
+    try {
+      const res = await book({ start: slot, name: f.get('name'), email: f.get('email'), note: f.get('note') });
+      onDone({ ...res, email: f.get('email') });
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  };
   return (
-    <form className="bk-form" onSubmit={(e) => { e.preventDefault(); onDone(new FormData(e.target).get('email')); }}>
+    <form className="bk-form" onSubmit={submit}>
       <p className="bk-chosen">{fmtFull(slot)} · 30 min · Zoom</p>
       <label>Your name<input name="name" required autoComplete="name" /></label>
       <label>Your email<input name="email" type="email" required autoComplete="email" /></label>
       <label>Where are you in your journey? <span>(optional)</span><textarea name="note" rows={2} /></label>
       <div className="bk-form-actions">
         <button type="button" className="bk-link" onClick={onBack}>← Change time</button>
-        <button type="submit" className="bk-primary">Confirm booking</button>
+        <button type="submit" className="bk-primary" disabled={busy}>{busy ? 'Booking…' : 'Confirm booking'}</button>
       </div>
+      {error && <p className="bk-error" role="alert">{error}</p>}
     </form>
   );
 }
 
-function Done({ slot, email }) {
+function Done({ booking: { start: slot, email } }) {
   return (
     <div className="bk-done">
       <p className="bk-done-mark">✓</p>
       <p className="bk-done-title">You’re booked.</p>
       <p>{fmtFull(slot)}</p>
       <p className="bk-muted">A calendar invite with the Zoom link is on its way to <b>{email}</b>.</p>
-      <p className="bk-preview-note">Preview only — nothing was booked.</p>
+      {!LIVE && <p className="bk-preview-note">Preview only — nothing was booked.</p>}
     </div>
   );
 }
 
 // Full picker: day strip → times → details → done. Used by designs A and B.
 export function Picker() {
-  const days = useSlots();
+  const { days, error } = useSlots();
   const [day, setDay] = useState(0);
   const [slot, setSlot] = useState(null);
-  const [email, setEmail] = useState(null);
-  if (email) return <Done slot={slot} email={email} />;
-  if (slot) return <DetailsForm slot={slot} onBack={() => setSlot(null)} onDone={setEmail} />;
+  const [booking, setBooking] = useState(null);
+  if (booking) return <Done booking={booking} />;
+  if (slot) return <DetailsForm slot={slot} onBack={() => setSlot(null)} onDone={setBooking} />;
+  if (!days) return <p className="bk-muted">Loading available times…</p>;
+  if (!days.length) return <SlotsFallback error={error} />;
   return (
     <div className="bk-picker">
       <p className="bk-step">1. Pick a day</p>
@@ -127,14 +150,16 @@ export function Picker() {
 
 // Design C: the next few free times as chips, a link to show the full picker.
 export function QuickTimes() {
-  const days = useSlots();
-  const next = days.flatMap((d) => d.times).slice(0, 6);
+  const { days, error } = useSlots();
   const [slot, setSlot] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [booking, setBooking] = useState(null);
   const [more, setMore] = useState(false);
   if (more) return <div className="bk-inline"><Picker /></div>;
-  if (email) return <div className="bk-inline"><Done slot={slot} email={email} /></div>;
-  if (slot) return <div className="bk-inline"><DetailsForm slot={slot} onBack={() => setSlot(null)} onDone={setEmail} /></div>;
+  if (booking) return <div className="bk-inline"><Done booking={booking} /></div>;
+  if (slot) return <div className="bk-inline"><DetailsForm slot={slot} onBack={() => setSlot(null)} onDone={setBooking} /></div>;
+  if (!days) return <p className="bk-quick bk-muted">Loading available times…</p>;
+  if (!days.length) return <div className="bk-quick"><SlotsFallback error={error} /></div>;
+  const next = days.flatMap((d) => d.times).slice(0, 6);
   return (
     <div className="bk-quick">
       <p className="bk-step">Next free times <span className="bk-muted">({TZ})</span></p>
@@ -195,6 +220,8 @@ export const bookingCss = `
 .bk-done{text-align:center;padding:12px 0;display:flex;flex-direction:column;gap:6px}
 .bk-done-mark{font-size:2rem;color:#496677}
 .bk-done-title{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.8rem}
+.bk-error{color:#a0352b;font-size:.9rem}
+.bk-primary:disabled{opacity:.6;cursor:default}
 .bk-preview-note{margin-top:10px;font-size:.75rem;color:#a0552b}
 .bk-inline{background:#fff;border:1px solid #d8dcdf;padding:22px;margin-top:26px;font-family:"DM Sans",Arial,sans-serif;color:#1f2a33}
 .bk-inline .bk-day{background:#f0ede8}

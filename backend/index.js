@@ -12,6 +12,7 @@ import { configured } from './db.js';
 import { UPLOADS_DIR } from './storage/local.js';
 import publicRoutes from './routes/public.js';
 import adminRoutes from './routes/admin.js';
+import webhookRoutes from './routes/webhooks.js';
 
 const app = express();
 
@@ -25,7 +26,8 @@ app.set('trust proxy', 1);
 if (process.env.CORS_ORIGIN) {
   app.use(cors({ origin: process.env.CORS_ORIGIN.split(',').map((s) => s.trim()) }));
 }
-app.use(express.json({ limit: '1mb' }));
+// Keep the raw bytes too: webhook signatures are computed over them.
+app.use(express.json({ limit: '1mb', verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, db: configured });
@@ -49,6 +51,7 @@ app.use('/api', (req, res, next) => {
 });
 
 app.use('/api/admin', adminRoutes);
+app.use('/api/webhooks', webhookRoutes);
 app.use('/api', publicRoutes);
 
 app.use('/api', (req, res) => {

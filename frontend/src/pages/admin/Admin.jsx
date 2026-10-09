@@ -6,6 +6,7 @@ import { BRAND } from '@client/config';
 import { useSeo } from '../../seo.js';
 import { getToken, setToken, login } from './adminApi.js';
 import AdminMessages from './AdminMessages.jsx';
+import AdminBookings from './AdminBookings.jsx';
 
 function Login({ onDone }) {
   const [password, setPassword] = useState('');
@@ -70,6 +71,7 @@ export default function Admin() {
         </button>
       </div>
       {/* Session expiry bounces back to login. */}
+      <AdminBookings onAuthError={() => setAuthed(false)} />
       <AdminMessages onAuthError={() => setAuthed(false)} />
     </main>
   );

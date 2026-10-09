@@ -298,6 +298,28 @@ router.get('/messages', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+router.get('/bookings', async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT id, cal_uid, status, starts_at, ends_at, name, email, time_zone, note, meeting_url, created_at
+       FROM bookings ORDER BY starts_at DESC`
+    );
+    res.json(result.rows.map((b) => ({
+      id: b.id,
+      uid: b.cal_uid,
+      status: b.status,
+      startsAt: b.starts_at,
+      endsAt: b.ends_at,
+      name: b.name,
+      email: b.email,
+      timeZone: b.time_zone,
+      note: b.note,
+      meetingUrl: b.meeting_url,
+      createdAt: b.created_at,
+    })));
+  } catch (err) { next(err); }
+});
+
 router.get('/subscribers', async (req, res, next) => {
   try {
     const result = await query('SELECT id, email, created_at FROM subscribers ORDER BY id DESC');

@@ -40,6 +40,10 @@ jobs:
           # The hosted API. Override by setting the VITE_API_URL repository
           # variable (Settings -> Secrets and variables -> Actions -> Variables).
           VITE_API_URL: ${{ vars.VITE_API_URL || 'https://doc-to-doc-api.onrender.com' }}
+          # Cal.com account behind the booking picker. Unset = preview mode
+          # (fake times, nothing booked). Set as repository variables.
+          VITE_CAL_USERNAME: ${{ vars.VITE_CAL_USERNAME }}
+          VITE_CAL_EVENT: ${{ vars.VITE_CAL_EVENT || 'intro-call' }}
         run: npm run build
 
       - name: SPA fallback
