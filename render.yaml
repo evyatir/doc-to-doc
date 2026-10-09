@@ -21,7 +21,7 @@ services:
       # The GitHub Pages front-end origin. Add the real domain here too, comma
       # separated, once BRAND.domain is picked.
       - key: CORS_ORIGIN
-        value: https://evyatir.github.io
+        value: https://doctodocmentors.com,https://www.doctodocmentors.com,https://evyatir.github.io
       # Paste these two in the Render dashboard — never commit them.
       - key: DATABASE_URL
         sync: false
