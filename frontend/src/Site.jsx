@@ -8,6 +8,9 @@ import React, { useEffect, useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
 import Consent, { openConsent } from './Consent.jsx';
+import { BookingProvider, useBooking, currentDesign, Picker, QuickTimes, DesignSwitcher, bookingCss } from './Booking.jsx';
+
+const DESIGN = currentDesign();
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -41,7 +44,7 @@ const FAQ = [
   ['Do I need to know which university I want?', 'No. We can help you explore medical schools and build a shortlist around your goals, priorities, and circumstances. You don’t need to have it all figured out before we meet.'],
   ['What does application support include?', 'We help you understand the steps for your chosen applications, organise your documents, and prepare and review your application materials. We can also discuss your questions about studying medicine and moving abroad.'],
   ['Can you guarantee admission?', 'No. Admission decisions belong to each university and cannot be guaranteed. Our role is to help you approach the application process with greater clarity, organisation, and confidence.'],
-  ['How do I get started?', 'Arrange a free introductory call. Tell us where you are in your journey and what you would like help with. Use the booking button to email us, and we’ll arrange the call together.'],
+  ['How do I get started?', 'Arrange a free introductory call. Tell us where you are in your journey and what you would like help with. Pick a time that suits you and we’ll send you a Zoom link for a 30-minute call.'],
 ];
 
 // lucide icons used by the original, same paths and default attributes.
@@ -64,8 +67,12 @@ function Icon({ name, size = 24, className = '' }) {
 }
 
 function BookButton({ className = '', children = 'Book a free introductory call' }) {
+  const { openPopup } = useBooking();
+  // Design A opens the booking pop-up; B and C scroll to the Contact section,
+  // where the times are shown.
+  const onClick = DESIGN === 'a' ? (e) => { e.preventDefault(); openPopup(); } : undefined;
   return (
-    <a className={`button ${className}`} href={BOOK_HREF}>
+    <a className={`button ${className}`} href={DESIGN === 'a' ? BOOK_HREF : '#contact'} onClick={onClick}>
       {children}
       <Icon name="arrow-up-right" size={19} />
     </a>
@@ -188,7 +195,8 @@ export default function Site() {
   }, []);
 
   return (
-    <>
+    <BookingProvider>
+      <style>{bookingCss}</style>
       <a href="#main" className="skip-link">Skip to content</a>
       <header className="site-header">
         <div className="header-inner wrap">
@@ -348,8 +356,12 @@ export default function Site() {
               <p className="eyebrow">04 / LET’S TALK</p>
               <h2>Your next chapter starts with<br /><em>a conversation.</em></h2>
               <p>Tell us where you are in your journey, what you’re considering, and what you’d like help with.</p>
-              <BookButton />
-              <span className="booking-note">Email us to arrange your free call.</span>
+              {DESIGN === 'a' && <>
+                <BookButton />
+                <span className="booking-note">Pick a time that suits you — 30 minutes on Zoom.</span>
+              </>}
+              {DESIGN === 'b' && <div className="bk-inline"><Picker /></div>}
+              {DESIGN === 'c' && <QuickTimes />}
               <div className="contact-links">
                 <a href={`mailto:${EMAIL}`}>{EMAIL}<Icon name="arrow-up-right" size={17} /></a>
                 <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram · @doctodcomentor<Icon name="arrow-up-right" size={17} /></a>
@@ -382,6 +394,7 @@ export default function Site() {
         </div>
       </footer>
       <Consent />
-    </>
+      <DesignSwitcher design={DESIGN} />
+    </BookingProvider>
   );
 }
