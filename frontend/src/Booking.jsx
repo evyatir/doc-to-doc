@@ -6,6 +6,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { getSlots, book, LIVE, TIME_ZONE as TZ } from './cal.js';
+import { trackBooking } from './analytics.js';
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const EMAIL = 'Doctodocmentors@gmail.com';
 
@@ -19,6 +22,9 @@ export function currentDesign() {
   const d = new URLSearchParams(window.location.search).get('design');
   return DESIGNS[d] ? d : 'a';
 }
+
+// The switcher bar is for review links only (?design=…), never for visitors.
+export const REVIEWING = DESIGNS[new URLSearchParams(window.location.search).get('design')] !== undefined;
 
 // Pop-up state shared by every "Book" button on the page (design A).
 const BookingCtx = createContext({ openPopup: () => {} });
@@ -50,6 +56,9 @@ function useSlots() {
   const [state, setState] = useState({ days: null, error: false });
   useEffect(() => {
     let live = true;
+    // Wake the API (Render free tier sleeps): by the time the visitor has
+    // picked a time and confirmed, it's up to receive Cal.com's webhook.
+    if (LIVE) fetch(`${API_BASE}/api/health`).catch(() => {});
     getSlots().then(
       (days) => live && setState({ days, error: false }),
       () => live && setState({ days: [], error: true }),
@@ -83,6 +92,7 @@ function DetailsForm({ slot, onBack, onDone }) {
     setError('');
     try {
       const res = await book({ start: slot, name: f.get('name'), email: f.get('email'), note: f.get('note') });
+      trackBooking();
       onDone({ ...res, email: f.get('email') });
     } catch (err) {
       setError(err.message);

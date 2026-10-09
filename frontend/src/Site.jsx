@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
 import Consent, { openConsent } from './Consent.jsx';
-import { BookingProvider, useBooking, currentDesign, Picker, QuickTimes, DesignSwitcher, bookingCss } from './Booking.jsx';
+import { BookingProvider, useBooking, currentDesign, Picker, QuickTimes, DesignSwitcher, REVIEWING, bookingCss } from './Booking.jsx';
 
 const DESIGN = currentDesign();
 
@@ -394,7 +394,7 @@ export default function Site() {
         </div>
       </footer>
       <Consent />
-      <DesignSwitcher design={DESIGN} />
+      {REVIEWING && <DesignSwitcher design={DESIGN} />}
     </BookingProvider>
   );
 }

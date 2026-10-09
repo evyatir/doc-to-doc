@@ -55,8 +55,10 @@ export default function Privacy() {
         </ul>
 
         <h2 style={s.h2}>What we collect</h2>
+        <h3 style={s.h3}>When you book a call</h3>
+        <p style={s.p}>The booking calendar shows our free times and lets you book a free 30-minute introductory call. We receive the time you choose, your name, your email address, your time zone, and anything you write about where you are in your journey. Bookings are handled by Cal.com, which checks our calendar and sends the invitation to you and to us. The call itself takes place on Zoom, and the invitation contains the Zoom link. We also keep a copy of each booking in our own database so we can follow up.</p>
         <h3 style={s.h3}>When you email us</h3>
-        <p style={s.p}>The “Book a free introductory call” buttons open your own email app with a message addressed to us. We receive what you choose to send, usually your name and email address, where you are in your journey, what you would like help with, and your availability. The website has no forms and stores nothing you type. Your message reaches us through Gmail.</p>
+        <p style={s.p}>We receive what you choose to send, usually your name and email address and your question. Your message reaches us through Gmail.</p>
         <h3 style={s.h3}>When you browse the site, only if you accept cookies</h3>
         <p style={s.p}>We use Google Analytics 4 to understand how visitors find and use the site. It runs only after you click <b>Accept</b> on the cookie banner. It records pages viewed, approximate location (country or city), device and browser, how you reached the site, and clicks on the booking button, our email address and our Instagram link.</p>
         <p style={s.p}>Google Analytics 4 does not store IP addresses. We do not use it for advertising: ad storage, ad personalisation and ad data sharing are always off. If you click <b>Decline</b> or make no choice, no analytics cookies are set. Google may still receive basic cookieless signals, such as that a page loaded, with no identifier that links visits together.</p>
@@ -73,7 +75,7 @@ export default function Privacy() {
 
         <h2 style={s.h2}>Why we use your data</h2>
         <Table head={['Purpose', 'Legal basis (GDPR)']} rows={[
-          ['Replying to your email and arranging a call', 'Steps at your request before an agreement (Art. 6(1)(b)) and our legitimate interest in answering enquiries (Art. 6(1)(f))'],
+          ['Booking and holding your introductory call, replying to your email', 'Steps at your request before an agreement (Art. 6(1)(b)) and our legitimate interest in answering enquiries (Art. 6(1)(f))'],
           ['Mentoring you, if you become a client', 'Performance of our agreement (Art. 6(1)(b))'],
           ['Website analytics', 'Your consent (Art. 6(1)(a))'],
         ]} />
@@ -81,7 +83,11 @@ export default function Privacy() {
         <h2 style={s.h2}>Who processes data for us</h2>
         <p style={s.p}>We do not sell your data or share it for anyone’s marketing. These providers process data on our behalf:</p>
         <Table head={['Provider', 'What for']} rows={[
-          ['Google LLC / Google Ireland Ltd', 'Google Analytics and Gmail'],
+          ['Google LLC / Google Ireland Ltd', 'Google Analytics, Gmail and Google Calendar'],
+          ['Cal.com, Inc.', 'Booking calendar and call invitations'],
+          ['Zoom Communications, Inc.', 'Video calls'],
+          ['Render Services, Inc.', 'Our booking records server'],
+          ['Neon, Inc.', 'Our booking records database (EU, Frankfurt)'],
           ['GitHub, Inc.', 'Website hosting (GitHub Pages)'],
           ['Cloudflare, Inc.', 'Domain name and DNS'],
         ]} />
@@ -90,6 +96,7 @@ export default function Privacy() {
         <h2 style={s.h2}>How long we keep data</h2>
         <ul style={s.ul}>
           <li><b>Analytics:</b> 14 months, after which Google deletes it.</li>
+          <li><b>Bookings:</b> as long as needed to hold the call and follow up, and no later than 24 months after our last contact.</li>
           <li><b>Emails:</b> as long as needed to answer you and, if you become a client, for the mentoring. We delete correspondence no later than 24 months after our last contact, unless the law requires longer.</li>
         </ul>
 

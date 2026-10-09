@@ -21,13 +21,14 @@ export function setChoice(granted) {
   gtag('consent', 'update', consentState(granted));
 }
 
-// Outbound actions are the site's only conversions: every "Book a free
-// introductory call" button, the plain email link, and Instagram.
+// Conversions: every "Book a free introductory call" button (it opens the
+// booking picker or scrolls to it), a confirmed booking (trackBooking, called
+// by the picker), the plain email link, and Instagram.
 function trackClicks() {
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a');
     if (!a) return;
-    if (a.classList.contains('button') && a.href.startsWith('mailto:')) {
+    if (a.classList.contains('button') && (a.href.startsWith('mailto:') || a.hash === '#contact')) {
       const section = a.closest('section, header')?.id || (a.closest('header') ? 'header' : a.closest('.mobile-sheet') ? 'mobile-menu' : 'hero');
       gtag('event', 'book_call_click', { location: section });
     } else if (a.href.startsWith('mailto:')) {
@@ -36,6 +37,10 @@ function trackClicks() {
       gtag('event', 'instagram_click');
     }
   });
+}
+
+export function trackBooking() {
+  gtag('event', 'booking_confirmed');
 }
 
 export function initAnalytics() {
