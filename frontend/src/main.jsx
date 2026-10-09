@@ -17,6 +17,7 @@ if (isAdmin) {
   Object.entries(cssVars()).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
 } else {
   style.textContent = siteCss;
+  document.body.className = 'antialiased';
 }
 document.head.appendChild(style);
 

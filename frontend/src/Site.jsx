@@ -2,9 +2,11 @@
 // (doc-to-doc-mentors.galidoyahav.chatgpt.site, 2026-10-09). Markup, copy and
 // class names match it exactly so its compiled stylesheet (site.css) applies
 // unchanged. The original used Radix (accordion, sheet) and lucide; both are
-// replaced by the small local equivalents below, with the same class names
-// and data-state attributes so the same CSS animations fire.
-import React, { useEffect, useRef, useState } from 'react';
+// used the same way here (shadcn wrappers inlined); lucide icons are inlined
+// with the same paths and attributes.
+import React, { useEffect, useState } from 'react';
+import * as Accordion from '@radix-ui/react-accordion';
+import * as Dialog from '@radix-ui/react-dialog';
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -69,91 +71,59 @@ function BookButton({ className = '', children = 'Book a free introductory call'
   );
 }
 
-function MobileMenu({ open, onClose }) {
-  const closeRef = useRef(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeRef.current?.focus();
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+// shadcn/ui Sheet, as the original composes it (Radix Dialog underneath).
+function MobileMenu({ open, onOpenChange }) {
   return (
-    <>
-      <div data-state="open" data-slot="sheet-overlay" onClick={onClose}
-        className="fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
-      <div role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" data-state="open" data-slot="sheet-content"
-        className="fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500 inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm mobile-sheet">
-        <div className="mobile-menu-top">
-          <h2 id="mobile-menu-title" data-slot="sheet-title" className="font-semibold text-foreground menu-wordmark">Doc. to Doc.</h2>
-          <button ref={closeRef} type="button" data-slot="sheet-close" className="menu-close" aria-label="Close menu" onClick={onClose}>
-            <Icon name="x" size={25} />
-          </button>
-        </div>
-        <p className="sr-only">Navigate the Doc. to Doc. website</p>
-        <nav aria-label="Mobile navigation">
-          {NAV.map((item, i) => (
-            <a key={item.href} href={item.href} onClick={onClose}>
-              <span>0{i + 1}</span>{item.title}
-            </a>
-          ))}
-        </nav>
-        <BookButton className="mobile-book" />
-        <p className="handwritten">Let’s find your way.</p>
-      </div>
-    </>
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Trigger asChild data-slot="sheet-trigger">
+        <button className="menu-trigger" aria-label="Open menu"><Icon name="menu" size={25} /></button>
+      </Dialog.Trigger>
+      <Dialog.Portal data-slot="sheet-portal">
+        <Dialog.Overlay data-slot="sheet-overlay"
+          className="fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+        <Dialog.Content data-slot="sheet-content"
+          className="fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500 inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm mobile-sheet">
+          <div className="mobile-menu-top">
+            <Dialog.Title data-slot="sheet-title" className="font-semibold text-foreground menu-wordmark">Doc. to Doc.</Dialog.Title>
+            <Dialog.Close data-slot="sheet-close" className="menu-close" aria-label="Close menu"><Icon name="x" size={25} /></Dialog.Close>
+          </div>
+          <Dialog.Description data-slot="sheet-description" className="text-sm text-muted-foreground sr-only">Navigate the Doc. to Doc. website</Dialog.Description>
+          <nav aria-label="Mobile navigation">
+            {NAV.map((item, i) => (
+              <a key={item.href} href={item.href} onClick={() => onOpenChange(false)}>
+                <span>0{i + 1}</span>{item.title}
+              </a>
+            ))}
+          </nav>
+          <BookButton className="mobile-book" />
+          <p className="handwritten">Let’s find your way.</p>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
-function FaqItem({ index, question, answer, open, onToggle }) {
-  const contentRef = useRef(null);
-  const [height, setHeight] = useState(0);
-  const state = open ? 'open' : 'closed';
-  const triggerId = `faq-trigger-${index}`;
-  const panelId = `faq-panel-${index}`;
-
-  useEffect(() => {
-    if (open && contentRef.current) setHeight(contentRef.current.scrollHeight);
-  }, [open]);
-
-  return (
-    <div data-state={state} data-orientation="vertical" data-slot="accordion-item" className="border-b last:border-b-0">
-      <h3 data-orientation="vertical" data-state={state} className="flex">
-        <button type="button" id={triggerId} aria-controls={panelId} aria-expanded={open} data-state={state}
-          data-orientation="vertical" data-slot="accordion-trigger" onClick={onToggle}
-          className="flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180">
-          <span className="faq-number">0{index + 1}</span>
-          <span className="faq-question">{question}</span>
-          <Icon name="chevron-down" className="pointer-events-none size-4 shrink-0 translate-y-0.5 text-muted-foreground transition-transform duration-200" />
-        </button>
-      </h3>
-      <div ref={contentRef} id={panelId} role="region" aria-labelledby={triggerId} hidden={!open}
-        data-state={state} data-orientation="vertical" data-slot="accordion-content"
-        className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-        style={{ '--radix-accordion-content-height': `${height}px` }}>
-        <div className="pt-0 pb-4"><p>{answer}</p></div>
-      </div>
-    </div>
-  );
-}
-
+// shadcn/ui Accordion, as the original composes it.
 function Faq() {
-  const [openIndex, setOpenIndex] = useState(null);
   return (
-    <div data-slot="accordion" className="faq-list" data-orientation="vertical">
+    <Accordion.Root data-slot="accordion" type="single" collapsible className="faq-list">
       {FAQ.map(([q, a], i) => (
-        <FaqItem key={q} index={i} question={q} answer={a} open={openIndex === i}
-          onToggle={() => setOpenIndex(openIndex === i ? null : i)} />
+        <Accordion.Item key={q} value={`faq-${i}`} data-slot="accordion-item" className="border-b last:border-b-0">
+          <Accordion.Header className="flex">
+            <Accordion.Trigger data-slot="accordion-trigger"
+              className="flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180">
+              <span className="faq-number">0{i + 1}</span>
+              <span className="faq-question">{q}</span>
+              <Icon name="chevron-down" className="pointer-events-none size-4 shrink-0 translate-y-0.5 text-muted-foreground transition-transform duration-200" />
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content data-slot="accordion-content"
+            className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+            <div className="pt-0 pb-4"><p>{a}</p></div>
+          </Accordion.Content>
+        </Accordion.Item>
       ))}
-    </div>
+    </Accordion.Root>
   );
 }
 
@@ -201,10 +171,8 @@ export default function Site() {
     if (id) document.getElementById(id)?.scrollIntoView();
   }, []);
 
-  const closeMenu = React.useCallback(() => setMenuOpen(false), []);
-
   return (
-    <div className="antialiased">
+    <>
       <a href="#main" className="skip-link">Skip to content</a>
       <header className="site-header">
         <div className="header-inner wrap">
@@ -215,13 +183,9 @@ export default function Site() {
             {NAV.map((item) => <a key={item.href} href={item.href}>{item.title}</a>)}
           </nav>
           <BookButton className="header-book" />
-          <button className="menu-trigger" aria-label="Open menu" type="button" aria-haspopup="dialog"
-            aria-expanded={menuOpen} data-state={menuOpen ? 'open' : 'closed'} onClick={() => setMenuOpen(true)}>
-            <Icon name="menu" size={25} />
-          </button>
+          <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
         </div>
       </header>
-      <MobileMenu open={menuOpen} onClose={closeMenu} />
 
       <main id="main">
         <Hero />
@@ -396,6 +360,6 @@ export default function Site() {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 }
