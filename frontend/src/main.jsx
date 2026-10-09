@@ -4,6 +4,7 @@ import App from './App.jsx';
 import siteCss from './site.css?inline';
 import { css as adminCss } from './styles.js';
 import { cssVars, loadFonts } from './theme.js';
+import { initAnalytics } from './analytics.js';
 
 // Two stylesheets that must never meet: the public site ships the client's
 // compiled stylesheet (site.css, Tailwind preflight included); the internal
@@ -18,6 +19,7 @@ if (isAdmin) {
 } else {
   style.textContent = siteCss;
   document.body.className = 'antialiased';
+  initAnalytics();
 }
 document.head.appendChild(style);
 

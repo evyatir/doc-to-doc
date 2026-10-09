@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
+import Consent from './Consent.jsx';
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -360,6 +361,7 @@ export default function Site() {
           </div>
         </div>
       </footer>
+      <Consent />
     </>
   );
 }
