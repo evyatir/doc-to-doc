@@ -165,11 +165,26 @@ export default function Site() {
     return () => io.disconnect();
   }, []);
 
-  // Deep links from the old multi-page site land here with a hash; jump to it
-  // once the sections exist.
+  // A refresh always starts at the top: drop any #section left by in-page
+  // links and stop the browser restoring the old scroll position. A fresh
+  // visit to a deep link (old multi-page URLs land on /#faq etc.) still
+  // jumps to its section once the sections exist.
   useEffect(() => {
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (nav?.type === 'reload') {
+      history.scrollRestoration = 'manual';
+      if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
+      window.scrollTo(0, 0);
+      return;
+    }
     const id = window.location.hash.slice(1);
-    if (id) document.getElementById(id)?.scrollIntoView();
+    if (!id) return undefined;
+    // Jump now, and again once images and fonts have settled the layout.
+    const jump = () => document.getElementById(id)?.scrollIntoView();
+    jump();
+    if (document.readyState === 'complete') return undefined;
+    window.addEventListener('load', jump, { once: true });
+    return () => window.removeEventListener('load', jump);
   }, []);
 
   return (
