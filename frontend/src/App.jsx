@@ -4,6 +4,7 @@ import { ToastProvider } from './components/Toast.jsx';
 import Site from './Site.jsx';
 import Admin from './pages/admin/Admin.jsx';
 import Privacy from './Privacy.jsx';
+import Survey from './Survey.jsx';
 
 // The public site is one page. Old multi-page URLs (shared links, search
 // results) land on the matching section instead of a 404.
@@ -22,6 +23,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Site />} />
           <Route path="/privacy" element={<Privacy />} />
+          {/* Follow-up emailed after a booking; not linked from the site. */}
+          <Route path="/survey" element={<Survey />} />
           {/* Internal leads panel: nothing on the public site links to it. */}
           <Route path="/admin" element={<Admin />} />
           {Object.entries(OLD_PAGES).map(([path, hash]) => (
