@@ -2,7 +2,7 @@
 // Only the survey email for now. RESEND_API_KEY unset = email is off: every
 // call resolves to null and nothing is sent.
 const API = process.env.RESEND_API_URL || 'https://api.resend.com'; // override = tests only
-const FROM = process.env.EMAIL_FROM || 'Doc. to Doc. <hello@doctodocmentors.com>';
+const FROM = process.env.EMAIL_FROM || 'Virginia from Doc. to Doc. <virginia@doctodocmentors.com>';
 const REPLY_TO = process.env.EMAIL_REPLY_TO || 'Doctodocmentors@gmail.com';
 const SITE = process.env.SITE_URL || 'https://doctodocmentors.com';
 const TEAM = process.env.TEAM_EMAIL || 'Doctodocmentors@gmail.com';
@@ -30,7 +30,7 @@ function surveyHtml(firstName, link) {
 <p>Hi ${esc(firstName)},</p>
 <p>Thanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:</p>
 <p><a href="${link}">${link}</a></p>
-<p>See you soon,<br>The Doc. to Doc. team</p>
+<p>See you soon,<br>Virginia<br>Doc. to Doc.</p>
 </div>`;
 }
 
@@ -46,7 +46,7 @@ export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = Num
     reply_to: REPLY_TO,
     subject: 'Quick question before our call',
     html: surveyHtml(firstName, link),
-    text: `Hi ${firstName},\n\nThanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:\n\n${link}\n\nSee you soon,\nThe Doc. to Doc. team`,
+    text: `Hi ${firstName},\n\nThanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:\n\n${link}\n\nSee you soon,\nVirginia\nDoc. to Doc.`,
     ...(delayMin > 0 ? { scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString() } : {}),
   });
   return data?.id || null;
