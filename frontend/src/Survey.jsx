@@ -14,10 +14,18 @@ const YEARS = [firstIntake, firstIntake + 1, firstIntake + 2].map(String).concat
 
 const COUNTRIES = ['Czech Republic', 'Poland', 'Hungary', 'Italy', 'Romania', 'Bulgaria', 'Slovakia', 'Another European country', 'I’m not sure yet'];
 
+// Both questions take several answers. The "not sure" option is exclusive:
+// picking it clears the others, and picking anything else clears it.
 const STEPS = [
-  { key: 'startYear', title: 'In what year would you like to start medical school?', options: YEARS },
-  { key: 'country', title: 'Where are you hoping to study medicine?', options: COUNTRIES },
+  { key: 'startYears', title: 'In what year would you like to start medical school?', options: YEARS, unsure: YEARS.at(-1) },
+  { key: 'countries', title: 'Where are you hoping to study medicine?', options: COUNTRIES, unsure: COUNTRIES.at(-1) },
 ];
+
+function toggle(list, option, unsure) {
+  if (list.includes(option)) return list.filter((o) => o !== option);
+  if (option === unsure) return [option];
+  return list.filter((o) => o !== unsure).concat(option);
+}
 
 async function submit(answers) {
   const booking = new URLSearchParams(window.location.search).get('b');
@@ -25,10 +33,32 @@ async function submit(answers) {
   console.info('[survey] answers', { booking, ...answers });
 }
 
+// Stethoscope drawn in on load (the tubing traces itself, then the chest
+// piece settles), as in the questionnaire Evyatar liked.
+function Stethoscope({ className = '' }) {
+  return (
+    <svg className={`sv-steth ${className}`} viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+      <g fill="none" stroke="#3a4249" strokeLinecap="round" strokeLinejoin="round">
+        <path className="sv-steth-metal" d="M30 14 C26 30 26 44 36 52 M58 14 C62 30 62 44 52 52" stroke="#9aa4ab" strokeWidth="3" />
+        <circle cx="30" cy="12" r="3.2" fill="#3a4249" stroke="none" />
+        <circle cx="58" cy="12" r="3.2" fill="#3a4249" stroke="none" />
+        <path className="sv-steth-tube" pathLength="1" d="M36 52 C40 60 48 60 52 52 M44 58 C44 76 40 92 52 100 C64 108 80 98 76 84 C73 74 62 78 66 88 C69 95 80 96 86 90" strokeWidth="4.5" />
+      </g>
+      <g className="sv-steth-head">
+        <circle cx="90" cy="88" r="11" fill="#5d666d" />
+        <circle cx="90" cy="88" r="7.5" fill="#c9d0d4" />
+        <circle cx="90" cy="88" r="3" fill="#8b959b" />
+      </g>
+    </svg>
+  );
+}
+
 function Choice({ label, selected, onSelect }) {
   return (
-    <button type="button" role="radio" aria-checked={selected} className={`sv-choice ${selected ? 'is-on' : ''}`} onClick={onSelect}>
-      <span className="sv-dot" aria-hidden="true" />
+    <button type="button" role="checkbox" aria-checked={selected} className={`sv-choice ${selected ? 'is-on' : ''}`} onClick={onSelect}>
+      <span className="sv-box" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </span>
       <span>{label}</span>
     </button>
   );
@@ -42,11 +72,11 @@ export default function Survey() {
   const [done, setDone] = useState(false);
 
   const current = STEPS[step];
-  const value = current && answers[current.key];
+  const picked = (current && answers[current.key]) || [];
   const last = step === STEPS.length - 1;
 
   const next = async () => {
-    if (!value) return;
+    if (!picked.length) return;
     if (!last) return setStep(step + 1);
     setBusy(true);
     await submit(answers);
@@ -63,7 +93,7 @@ export default function Survey() {
       <section className="sv-card" aria-live="polite">
         {done ? (
           <div className="sv-done">
-            <p className="sv-mark">✓</p>
+            <Stethoscope className="is-done" />
             <h1 className="sv-title">Thank you.</h1>
             <p className="sv-lead">That helps us make your introductory call as useful as possible. See you soon.</p>
             <a className="sv-link" href={home}>Back to Doc. to Doc.</a>
@@ -74,19 +104,23 @@ export default function Survey() {
               <span>{step + 1} of {STEPS.length}</span>
               <div className="sv-bar"><div style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
             </div>
-            <p className="sv-eyebrow">BEFORE WE MEET</p>
+            <div className="sv-head">
+              <p className="sv-eyebrow">BEFORE WE MEET</p>
+              {step === 0 && <Stethoscope />}
+            </div>
             <h1 className="sv-title">{current.title}</h1>
-            <div className="sv-grid" role="radiogroup" aria-label={current.title}>
+            <p className="sv-hint">Choose all that apply.</p>
+            <div className="sv-grid" role="group" aria-label={current.title}>
               {current.options.map((o) => (
-                <Choice key={o} label={o} selected={value === o}
-                  onSelect={() => setAnswers({ ...answers, [current.key]: o })} />
+                <Choice key={o} label={o} selected={picked.includes(o)}
+                  onSelect={() => setAnswers({ ...answers, [current.key]: current.options.filter((x) => toggle(picked, o, current.unsure).includes(x)) })} />
               ))}
             </div>
             <div className="sv-actions">
               {step > 0
                 ? <button type="button" className="sv-link" onClick={() => setStep(step - 1)}>← Back</button>
                 : <span />}
-              <button type="button" className="sv-next" disabled={!value || busy} onClick={next}>
+              <button type="button" className="sv-next" disabled={!picked.length || busy} onClick={next}>
                 {last ? (busy ? 'Sending…' : 'Send') : 'Next'}
               </button>
             </div>
@@ -106,22 +140,31 @@ const css = `
 .sv-bar{flex:1;height:4px;border-radius:4px;background:#e6e1d9;overflow:hidden}
 .sv-bar div{height:100%;background:#496677;border-radius:4px;transition:width .35s ease}
 .sv-eyebrow{font-family:"Archivo Black","DM Sans",sans-serif;font-size:.78rem;letter-spacing:.02em;color:#496677;margin-bottom:12px}
-.sv-title{font-family:"Cormorant Garamond",Georgia,serif;font-weight:400;font-size:clamp(1.9rem,4.6vw,2.6rem);line-height:1.08;margin-bottom:28px}
+.sv-title{font-family:"Cormorant Garamond",Georgia,serif;font-weight:400;font-size:clamp(1.9rem,4.6vw,2.6rem);line-height:1.08;margin-bottom:10px}
+.sv-hint{font-size:.9rem;color:#6b7780;margin-bottom:24px}
 .sv-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .sv-choice{display:flex;align-items:center;gap:18px;min-height:64px;padding:14px 22px;background:#fff;border:1px solid #e6e1d9;border-radius:22px;font:inherit;font-size:1.05rem;color:#1f2a33;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s}
 .sv-choice:hover{border-color:#b9c6cd}
 .sv-choice:active{transform:scale(.99)}
 .sv-choice:focus-visible{outline:2px solid #496677;outline-offset:2px}
 .sv-choice.is-on{border-color:#496677;box-shadow:0 0 0 1px #496677 inset}
-.sv-dot{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid #dcd7cf;position:relative;transition:border-color .15s}
-.sv-choice.is-on .sv-dot{border-color:#496677}
-.sv-choice.is-on .sv-dot::after{content:"";position:absolute;inset:4px;border-radius:50%;background:#496677}
+.sv-box{flex:0 0 auto;width:24px;height:24px;border-radius:7px;border:2px solid #dcd7cf;display:grid;place-items:center;color:transparent;transition:background .15s,border-color .15s}
+.sv-choice.is-on .sv-box{background:#496677;border-color:#496677;color:#fff}
 .sv-actions{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
 .sv-next{background:#496677;color:#fff;border:0;border-radius:999px;padding:14px 34px;font:inherit;font-size:1rem;cursor:pointer;transition:opacity .15s}
 .sv-next:disabled{opacity:.35;cursor:default}
 .sv-link{background:none;border:0;padding:0;font:inherit;font-size:.95rem;color:#496677;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .sv-done{text-align:center;padding:24px 0 8px}
-.sv-mark{font-size:2.2rem;color:#496677}
+.sv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:6px}
+.sv-steth{flex:0 0 auto;width:76px;height:76px;margin:-30px -8px 4px 0}
+.sv-steth.is-done{width:110px;height:110px;margin:0 auto 4px;display:block}
+.sv-steth-tube{stroke-dasharray:1;stroke-dashoffset:1;animation:sv-draw 1.4s .2s ease-out forwards}
+.sv-steth-metal{opacity:0;animation:sv-fade .5s .1s ease-out forwards}
+.sv-steth-head{transform-origin:90px 88px;transform:scale(0);animation:sv-pop .45s 1.3s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes sv-draw{to{stroke-dashoffset:0}}
+@keyframes sv-fade{to{opacity:1}}
+@keyframes sv-pop{to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.sv-steth-tube,.sv-steth-metal,.sv-steth-head{animation:none;stroke-dashoffset:0;opacity:1;transform:none}}
 .sv-lead{max-width:30rem;margin:0 auto 22px;line-height:1.6;color:#3d4a53}
 .sv-foot{margin-top:18px;font-size:.78rem;color:#8a949b}
 @media (max-width:600px){.sv-card{padding:26px 18px 20px;border-radius:22px}.sv-grid{grid-template-columns:1fr}.sv-choice{min-height:56px;font-size:1rem}}
