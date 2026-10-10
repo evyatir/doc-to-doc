@@ -65,7 +65,7 @@ function Choice({ label, selected, onSelect }) {
 }
 
 export default function Survey() {
-  useSeo('A quick question', 'Help us prepare for your introductory call');
+  useSeo('12-second survey', 'Help us prepare for your introductory call');
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [busy, setBusy] = useState(false);
@@ -105,7 +105,7 @@ export default function Survey() {
               <div className="sv-bar"><div style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} /></div>
             </div>
             <div className="sv-head">
-              <p className="sv-eyebrow">BEFORE WE MEET</p>
+              <p className="sv-eyebrow">12-SECOND SURVEY</p>
               {step === 0 && <Stethoscope />}
             </div>
             <h1 className="sv-title">{current.title}</h1>
@@ -127,7 +127,7 @@ export default function Survey() {
           </>
         )}
       </section>
-      <p className="sv-foot">Takes under a minute · Doc. to Doc.</p>
+      <p className="sv-foot">12-second survey · Doc. to Doc.</p>
     </main>
   );
 }
