@@ -58,7 +58,7 @@ export default function Privacy() {
         <h3 style={s.h3}>When you book a call</h3>
         <p style={s.p}>The booking calendar shows our free times and lets you book a free 30-minute introductory call. We receive the time you choose, your name, your email address, your time zone, and anything you write about where you are in your journey. Bookings are handled by Cal.com, which checks our calendar and sends the invitation to you and to us. The call itself takes place on Google Meet, and the invitation contains the Meet link. We also keep a copy of each booking in our own database so we can follow up.</p>
         <h3 style={s.h3}>The 12-second survey</h3>
-        <p style={s.p}>About 10 minutes after you book, we email you a two-question survey: when you would like to start medical school and where you hope to study. Answering is optional. Your answers are stored with your booking so we can prepare for the call. The email is sent through Resend.</p>
+        <p style={s.p}>Right after you book, we email you a two-question survey: when you would like to start medical school and where you hope to study. Answering is optional. Your answers are stored with your booking so we can prepare for the call. The email is sent through Resend.</p>
         <h3 style={s.h3}>When you email us</h3>
         <p style={s.p}>We receive what you choose to send, usually your name and email address and your question. Your message reaches us through Gmail.</p>
         <h3 style={s.h3}>When you browse the site, only if you accept cookies</h3>

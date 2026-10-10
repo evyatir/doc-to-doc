@@ -50,7 +50,7 @@ const UPSERT = `
     replaces = COALESCE(EXCLUDED.replaces, bookings.replaces), updated_at = now()
   RETURNING id, (xmax = 0) AS inserted, survey_email_id`;
 
-// The 12-second survey goes out ~10 minutes after a NEW booking (not a
+// The 12-second survey goes out right after a NEW booking (not a
 // reschedule, not a duplicate delivery). Email trouble never fails the
 // webhook: the booking is saved either way and Cal.com would only retry it.
 async function sendSurvey(row, p) {
@@ -85,7 +85,7 @@ router.post('/cal', async (req, res, next) => {
       await query(UPSERT, bookingRow(p));
       const { rows } = await query(
         `UPDATE bookings SET status = 'cancelled', updated_at = now() WHERE cal_uid = $1 RETURNING survey_email_id`, [p.uid]);
-      // Cancelled within the 10 minutes: stop the survey email. Already sent = Resend refuses; fine.
+      // Stops a still-scheduled survey email (SURVEY_DELAY_MIN). Already sent = Resend refuses; fine.
       await cancelEmail(rows[0]?.survey_email_id).catch(() => {});
     } else {
       return res.json({ ok: true, ignored: triggerEvent });

@@ -1,4 +1,4 @@
--- The 12-second survey emailed ~10 minutes after a booking (frontend
+-- The 12-second survey emailed right after a booking (frontend
 -- /survey?b=<cal booking uid>). One answer set per booking; a resubmit
 -- replaces it. survey_email_id lets a cancellation cancel the scheduled email.
 

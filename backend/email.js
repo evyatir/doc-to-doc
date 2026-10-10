@@ -35,9 +35,10 @@ function surveyHtml(firstName, link) {
 </table></td></tr></table></body></html>`;
 }
 
-// Schedules the survey email `delayMin` minutes from now. Resolves with the
-// Resend email id (to cancel it later), or null when email is off.
-export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = 10 }) {
+// Sends the survey email right away, or `delayMin` minutes from now when
+// SURVEY_DELAY_MIN is set. Resolves with the Resend email id (a scheduled one
+// can be cancelled), or null when email is off.
+export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = Number(process.env.SURVEY_DELAY_MIN) || 0 }) {
   const link = `${SITE}/survey?b=${encodeURIComponent(bookingUid)}`;
   const firstName = (name || '').trim().split(/\s+/)[0] || 'there';
   const data = await resend('/emails', {
@@ -47,7 +48,7 @@ export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = 10 
     subject: 'A 12-second question before our call',
     html: surveyHtml(firstName, link),
     text: `Hi ${firstName}, thanks for booking your call.\n\nTwo quick questions help us prepare: ${link}\n\nDoc. to Doc.`,
-    scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString(),
+    ...(delayMin > 0 ? { scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString() } : {}),
   });
   return data?.id || null;
 }

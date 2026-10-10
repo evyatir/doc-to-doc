@@ -1,4 +1,4 @@
-// /survey — the 12-second survey, emailed ~10 minutes after a lead books an
+// /survey — the 12-second survey, emailed right after a lead books an
 // intro call (backend/email.js). ?b=<cal booking uid> ties the answers to the
 // booking; they show next to the call in /admin.
 import React, { useEffect, useState } from 'react';
