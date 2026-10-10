@@ -5,6 +5,7 @@ const API = process.env.RESEND_API_URL || 'https://api.resend.com'; // override 
 const FROM = process.env.EMAIL_FROM || 'Doc. to Doc. <hello@doctodocmentors.com>';
 const REPLY_TO = process.env.EMAIL_REPLY_TO || 'Doctodocmentors@gmail.com';
 const SITE = process.env.SITE_URL || 'https://doctodocmentors.com';
+const TEAM = process.env.TEAM_EMAIL || 'Doctodocmentors@gmail.com';
 
 async function resend(path, body) {
   const key = process.env.RESEND_API_KEY;
@@ -51,6 +52,32 @@ export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = Num
     ...(delayMin > 0 ? { scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString() } : {}),
   });
   return data?.id || null;
+}
+
+// Tells the team a lead answered the survey. `lead` = the booking row, or
+// null when the survey was opened without a booking link. Reply-To is the
+// lead, so hitting Reply in Gmail answers them directly.
+export async function sendSurveyAnswers({ lead, startYears, countries }) {
+  const when = lead?.starts_at
+    ? new Date(lead.starts_at).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Prague' }) + ' (Prague)'
+    : null;
+  const rows = [
+    ['Lead', lead ? `${lead.name} <${lead.email}>` : 'Unknown (no booking link)'],
+    ...(when ? [['Call', when]] : []),
+    ['Wants to start', startYears.join(', ')],
+    ['Hoping to study in', countries.join(', ')],
+  ];
+  return resend('/emails', {
+    from: FROM,
+    to: [TEAM],
+    ...(lead?.email ? { reply_to: lead.email } : {}),
+    subject: `Survey answers: ${lead?.name || 'a lead'}`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2a33;font-size:15px;line-height:1.6">
+<p style="margin:0 0 12px"><b>${esc(lead?.name || 'A lead')}</b> answered the 12-second survey.</p>
+<table cellpadding="6" style="border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="color:#6b7780;padding-right:16px">${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>
+<p style="margin:16px 0 0;color:#8a949b;font-size:12px">All calls: ${SITE}/admin</p></div>`,
+    text: rows.map(([k, v]) => `${k}: ${v}`).join('\n'),
+  });
 }
 
 export async function cancelEmail(id) {

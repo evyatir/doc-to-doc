@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { query, tx } from '../db.js';
 import { fetchProducts } from '../queries.js';
+import { sendSurveyAnswers } from '../email.js';
 
 const router = Router();
 
@@ -196,6 +197,13 @@ router.post('/survey', rateLimit, async (req, res, next) => {
       [body.booking || null, JSON.stringify(body.startYears), JSON.stringify(body.countries)]
     );
     res.json({ ok: true });
+    // Copy to the team's Gmail. After the response: email trouble never
+    // costs the lead their answer, which is already saved.
+    (body.booking
+      ? query('SELECT name, email, starts_at FROM bookings WHERE cal_uid = $1', [body.booking])
+      : Promise.resolve({ rows: [] }))
+      .then(({ rows }) => sendSurveyAnswers({ lead: rows[0] || null, startYears: body.startYears, countries: body.countries }))
+      .catch((err) => console.error('survey answers email:', err.message));
   } catch (err) { next(err); }
 });
 
