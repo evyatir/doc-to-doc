@@ -64,11 +64,11 @@ function Icon({ name, size = 24, className = '' }) {
   );
 }
 
-function BookButton({ className = '', children = 'Book a free introductory call' }) {
+function BookButton({ className = '', children = 'Book a free introductory call', onClick }) {
   const { openPopup } = useBooking();
   // Opens the booking pop-up; the mailto: href stays as the no-JS fallback.
   return (
-    <a className={`button ${className}`} href={BOOK_HREF} onClick={(e) => { e.preventDefault(); openPopup(); }}>
+    <a className={`button ${className}`} href={BOOK_HREF} onClick={(e) => { e.preventDefault(); onClick?.(); openPopup(); }}>
       {children}
       <Icon name="arrow-up-right" size={19} />
     </a>
@@ -99,7 +99,7 @@ function MobileMenu({ open, onOpenChange }) {
               </a>
             ))}
           </nav>
-          <BookButton className="mobile-book" />
+          <BookButton className="mobile-book" onClick={() => onOpenChange(false)} />
           <p className="handwritten">Let’s find your way.</p>
         </Dialog.Content>
       </Dialog.Portal>
