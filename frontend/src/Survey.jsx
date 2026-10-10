@@ -28,14 +28,23 @@ function toggle(list, option, unsure) {
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
+const BOOKING = new URLSearchParams(window.location.search).get('b');
+// One answer per booking (the server enforces it); without a booking link,
+// one per browser.
+const DONE_KEY = `dtd-survey-${BOOKING || 'direct'}`;
+const doneHere = () => { try { return localStorage.getItem(DONE_KEY) === '1'; } catch { return false; } };
+const markDone = () => { try { localStorage.setItem(DONE_KEY, '1'); } catch { /* private mode */ } };
+
 async function submit(answers) {
-  const booking = new URLSearchParams(window.location.search).get('b');
+  const booking = BOOKING;
   const res = await fetch(`${API_BASE}/api/survey`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ booking, ...answers }),
   });
+  if (res.status === 409) return 'already';
   if (!res.ok) throw new Error(`survey ${res.status}`);
+  return 'saved';
 }
 
 // Stethoscope drawn in on load (the tubing traces itself, then the chest
@@ -74,11 +83,15 @@ export default function Survey() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [busy, setBusy] = useState(false);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(doneHere() ? 'already' : false);
   const [error, setError] = useState('');
 
-  // Wake the API (Render free tier sleeps) while they read the first question.
-  useEffect(() => { fetch(`${API_BASE}/api/health`).catch(() => {}); }, []);
+  // Already answered from another device? Ask the server. This also wakes
+  // the API (Render free tier sleeps) while they read the first question.
+  useEffect(() => {
+    const url = BOOKING ? `${API_BASE}/api/survey/${encodeURIComponent(BOOKING)}` : `${API_BASE}/api/health`;
+    fetch(url).then((r) => r.json()).then((d) => { if (d.answered) setDone('already'); }).catch(() => {});
+  }, []);
 
   const current = STEPS[step];
   const picked = (current && answers[current.key]) || [];
@@ -90,8 +103,8 @@ export default function Survey() {
     setBusy(true);
     setError('');
     try {
-      await submit(answers);
-      setDone(true);
+      setDone(await submit(answers));
+      markDone();
     } catch {
       // Render's free tier can take ~50 s to wake; a retry usually works.
       setError('That didn’t go through. Please try again in a moment.');
@@ -110,8 +123,10 @@ export default function Survey() {
         {done ? (
           <div className="sv-done">
             <Stethoscope className="is-done" />
-            <h1 className="sv-title">Thank you.</h1>
-            <p className="sv-lead">That helps us make your introductory call as useful as possible. See you soon.</p>
+            <h1 className="sv-title">{done === 'already' ? 'Already answered.' : 'Thank you.'}</h1>
+            <p className="sv-lead">{done === 'already'
+              ? 'We already have your answers, so there’s nothing more to do. See you on the call.'
+              : 'That helps us make your introductory call as useful as possible. See you soon.'}</p>
             <a className="sv-link" href={home}>Back to Doc. to Doc.</a>
           </div>
         ) : (

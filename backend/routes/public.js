@@ -178,24 +178,32 @@ router.post('/contact', rateLimit, async (req, res, next) => {
 });
 
 // 12-second survey (frontend /survey). `booking` = the Cal.com booking uid
-// from the email link; one answer set per booking, a resubmit replaces it.
-// No booking (someone opened /survey directly) = stored without one.
+// from the email link. ONE answer per booking: a second submit gets 409 and
+// changes nothing. No booking (someone opened /survey directly) = stored
+// without one (the page itself allows one answer per browser).
 const surveySchema = z.object({
   booking: z.string().trim().max(100).optional().nullable(),
   startYears: z.array(z.string().trim().min(1).max(40)).min(1).max(10),
   countries: z.array(z.string().trim().min(1).max(60)).min(1).max(15),
 });
 
+router.get('/survey/:booking', async (req, res, next) => {
+  try {
+    const { rows } = await query('SELECT 1 FROM survey_responses WHERE booking_uid = $1', [req.params.booking]);
+    res.json({ answered: rows.length > 0 });
+  } catch (err) { next(err); }
+});
+
 router.post('/survey', rateLimit, async (req, res, next) => {
   const body = parseBody(surveySchema, req, res);
   if (!body) return;
   try {
-    await query(
+    const saved = await query(
       `INSERT INTO survey_responses (booking_uid, start_years, countries) VALUES ($1, $2, $3)
-       ON CONFLICT (booking_uid) DO UPDATE SET start_years = EXCLUDED.start_years,
-         countries = EXCLUDED.countries, created_at = now()`,
+       ON CONFLICT (booking_uid) DO NOTHING RETURNING id`,
       [body.booking || null, JSON.stringify(body.startYears), JSON.stringify(body.countries)]
     );
+    if (!saved.rows.length) return res.status(409).json({ error: 'Already answered' });
     res.json({ ok: true });
     // Copy to the team's Gmail. After the response: email trouble never
     // costs the lead their answer, which is already saved.

@@ -22,16 +22,32 @@ async function resend(path, body) {
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// Written like a personal note, not a newsletter: no layout, no button, no
-// footer. Gmail files designed emails under Promotions; plain ones land in
-// Primary far more often.
+// A personal note from Virginia: short text, one quiet button, her signature
+// with photo. Kept light on purpose: heavy "newsletter" layouts get filed
+// under Gmail's Promotions tab.
 function surveyHtml(firstName, link) {
-  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222">
-<p>Hi ${esc(firstName)},</p>
-<p>Thanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:</p>
-<p><a href="${link}">${link}</a></p>
-<p>See you soon,<br>Virginia<br>Doc. to Doc.</p>
-</div>`;
+  const photo = `${SITE}/assets/email/virginia.jpg`;
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#ffffff">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:28px 20px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;font-family:Helvetica,Arial,sans-serif;color:#1f2a33;font-size:16px;line-height:1.6">
+<tr><td>
+<p style="margin:0 0 16px">Hi ${esc(firstName)},</p>
+<p style="margin:0 0 16px">Thanks for booking your free introductory call. We're looking forward to meeting you.</p>
+<p style="margin:0 0 24px">To make the most of our time together, could you answer two quick questions? It takes about 12 seconds.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 28px"><tr><td style="border-radius:999px;background:#496677">
+<a href="${link}" style="display:inline-block;padding:13px 26px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold">Answer 2 quick questions &rarr;</a>
+</td></tr></table>
+<p style="margin:0 0 20px">See you soon,</p>
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td style="padding-right:14px;vertical-align:top"><img src="${photo}" width="64" height="64" alt="Virginia Pincelli" style="display:block;border-radius:50%;width:64px;height:64px"></td>
+<td style="vertical-align:top;font-size:14px;line-height:1.45">
+<div style="font-size:16px;font-weight:bold;color:#1f2a33">Virginia Pincelli</div>
+<div style="color:#496677">Doctor &middot; Mentor at Doc. to Doc.</div>
+<div style="color:#6b7780">First Faculty of Medicine, Charles University, Prague</div>
+<div style="margin-top:4px"><a href="${SITE}" style="color:#496677;text-decoration:none">doctodocmentors.com</a></div>
+</td></tr></table>
+</td></tr></table>
+</td></tr></table></body></html>`;
 }
 
 // Sends the survey email right away, or `delayMin` minutes from now when
@@ -46,7 +62,7 @@ export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = Num
     reply_to: REPLY_TO,
     subject: 'Quick question before our call',
     html: surveyHtml(firstName, link),
-    text: `Hi ${firstName},\n\nThanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:\n\n${link}\n\nSee you soon,\nVirginia\nDoc. to Doc.`,
+    text: `Hi ${firstName},\n\nThanks for booking your free introductory call. We're looking forward to meeting you.\n\nTo make the most of our time together, could you answer two quick questions? It takes about 12 seconds:\n${link}\n\nSee you soon,\nVirginia Pincelli\nDoctor · Mentor at Doc. to Doc.\ndoctodocmentors.com`,
     ...(delayMin > 0 ? { scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString() } : {}),
   });
   return data?.id || null;
