@@ -22,18 +22,16 @@ async function resend(path, body) {
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Written like a personal note, not a newsletter: no layout, no button, no
+// footer. Gmail files designed emails under Promotions; plain ones land in
+// Primary far more often.
 function surveyHtml(firstName, link) {
-  return `<!doctype html><html><body style="margin:0;background:#f0ede8;font-family:Arial,Helvetica,sans-serif;color:#1f2a33">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:20px">
-<tr><td style="padding:32px 32px 8px">
-<p style="margin:0 0 6px;font-size:12px;letter-spacing:1px;color:#496677;font-weight:bold">12-SECOND SURVEY</p>
-<h1 style="margin:0 0 16px;font-family:Georgia,serif;font-weight:normal;font-size:28px;line-height:1.15">Hi ${esc(firstName)}, thanks for booking your call.</h1>
-<p style="margin:0 0 24px;font-size:15px;line-height:1.6">Two quick questions help us make it as useful as possible: when you'd like to start, and where you hope to study.</p>
-<p style="margin:0 0 28px"><a href="${link}" style="display:inline-block;background:#496677;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:999px;font-size:15px">Answer in 12 seconds</a></p>
-</td></tr>
-<tr><td style="padding:0 32px 28px;font-size:12px;color:#8a949b;line-height:1.5">Doc. to Doc. · Personal guidance. Firsthand experience.<br>You're getting this because you booked an introductory call at doctodocmentors.com.</td></tr>
-</table></td></tr></table></body></html>`;
+  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222">
+<p>Hi ${esc(firstName)},</p>
+<p>Thanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:</p>
+<p><a href="${link}">${link}</a></p>
+<p>See you soon,<br>The Doc. to Doc. team</p>
+</div>`;
 }
 
 // Sends the survey email right away, or `delayMin` minutes from now when
@@ -46,9 +44,9 @@ export async function scheduleSurveyEmail({ to, name, bookingUid, delayMin = Num
     from: FROM,
     to: [to],
     reply_to: REPLY_TO,
-    subject: 'A 12-second question before our call',
+    subject: 'Quick question before our call',
     html: surveyHtml(firstName, link),
-    text: `Hi ${firstName}, thanks for booking your call.\n\nTwo quick questions help us prepare: ${link}\n\nDoc. to Doc.`,
+    text: `Hi ${firstName},\n\nThanks for booking a call with us. To make it as useful as possible, could you answer two quick questions? It takes about 12 seconds:\n\n${link}\n\nSee you soon,\nThe Doc. to Doc. team`,
     ...(delayMin > 0 ? { scheduled_at: new Date(Date.now() + delayMin * 60000).toISOString() } : {}),
   });
   return data?.id || null;
