@@ -15,6 +15,7 @@ function Booking({ b }) {
         {b.timeZone ? ` · ${b.timeZone}` : ''}
         {off ? ` · ${b.status.toUpperCase()}` : ''}
       </p>
+      {b.survey && <p className="admin-message-meta">Start: {b.survey.startYears.join(', ')} · Where: {b.survey.countries.join(', ')}</p>}
       {b.note && <p>{b.note}</p>}
       {b.meetingUrl && !off && <p className="admin-message-meta"><a href={b.meetingUrl} target="_blank" rel="noopener noreferrer">Meeting link</a></p>}
     </div>

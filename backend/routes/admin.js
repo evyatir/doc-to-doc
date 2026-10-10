@@ -301,8 +301,10 @@ router.get('/messages', async (req, res, next) => {
 router.get('/bookings', async (req, res, next) => {
   try {
     const result = await query(
-      `SELECT id, cal_uid, status, starts_at, ends_at, name, email, time_zone, note, meeting_url, created_at
-       FROM bookings ORDER BY starts_at DESC`
+      `SELECT b.id, b.cal_uid, b.status, b.starts_at, b.ends_at, b.name, b.email, b.time_zone, b.note,
+              b.meeting_url, b.created_at, s.start_years, s.countries
+       FROM bookings b LEFT JOIN survey_responses s ON s.booking_uid IN (b.cal_uid, b.replaces) -- answers survive a reschedule
+       ORDER BY b.starts_at DESC`
     );
     res.json(result.rows.map((b) => ({
       id: b.id,
@@ -316,6 +318,7 @@ router.get('/bookings', async (req, res, next) => {
       note: b.note,
       meetingUrl: b.meeting_url,
       createdAt: b.created_at,
+      survey: b.start_years ? { startYears: b.start_years, countries: b.countries } : null,
     })));
   } catch (err) { next(err); }
 });

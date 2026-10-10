@@ -176,4 +176,27 @@ router.post('/contact', rateLimit, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// 12-second survey (frontend /survey). `booking` = the Cal.com booking uid
+// from the email link; one answer set per booking, a resubmit replaces it.
+// No booking (someone opened /survey directly) = stored without one.
+const surveySchema = z.object({
+  booking: z.string().trim().max(100).optional().nullable(),
+  startYears: z.array(z.string().trim().min(1).max(40)).min(1).max(10),
+  countries: z.array(z.string().trim().min(1).max(60)).min(1).max(15),
+});
+
+router.post('/survey', rateLimit, async (req, res, next) => {
+  const body = parseBody(surveySchema, req, res);
+  if (!body) return;
+  try {
+    await query(
+      `INSERT INTO survey_responses (booking_uid, start_years, countries) VALUES ($1, $2, $3)
+       ON CONFLICT (booking_uid) DO UPDATE SET start_years = EXCLUDED.start_years,
+         countries = EXCLUDED.countries, created_at = now()`,
+      [body.booking || null, JSON.stringify(body.startYears), JSON.stringify(body.countries)]
+    );
+    res.json({ ok: true });
+  } catch (err) { next(err); }
+});
+
 export default router;

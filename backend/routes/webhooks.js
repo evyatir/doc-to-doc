@@ -6,6 +6,7 @@
 import { Router } from 'express';
 import crypto from 'node:crypto';
 import { query } from '../db.js';
+import { scheduleSurveyEmail, cancelEmail } from '../email.js';
 
 const router = Router();
 
@@ -46,7 +47,23 @@ const UPSERT = `
     starts_at = EXCLUDED.starts_at, ends_at = EXCLUDED.ends_at, name = EXCLUDED.name,
     email = EXCLUDED.email, time_zone = EXCLUDED.time_zone, note = EXCLUDED.note,
     meeting_url = COALESCE(EXCLUDED.meeting_url, bookings.meeting_url),
-    replaces = COALESCE(EXCLUDED.replaces, bookings.replaces), updated_at = now()`;
+    replaces = COALESCE(EXCLUDED.replaces, bookings.replaces), updated_at = now()
+  RETURNING id, (xmax = 0) AS inserted, survey_email_id`;
+
+// The 12-second survey goes out ~10 minutes after a NEW booking (not a
+// reschedule, not a duplicate delivery). Email trouble never fails the
+// webhook: the booking is saved either way and Cal.com would only retry it.
+async function sendSurvey(row, p) {
+  const who = p.attendees?.[0] || {};
+  const email = who.email || answer(p, 'email');
+  if (!row?.inserted || row.survey_email_id || !email) return;
+  try {
+    const id = await scheduleSurveyEmail({ to: email, name: who.name || answer(p, 'name'), bookingUid: p.uid });
+    if (id) await query('UPDATE bookings SET survey_email_id = $1 WHERE id = $2', [id, row.id]);
+  } catch (err) {
+    console.error('survey email:', err.message);
+  }
+}
 
 router.post('/cal', async (req, res, next) => {
   if (!process.env.CAL_WEBHOOK_SECRET) return res.status(503).json({ error: 'Webhook not configured' });
@@ -58,14 +75,18 @@ router.post('/cal', async (req, res, next) => {
 
   try {
     if (triggerEvent === 'BOOKING_CREATED' || triggerEvent === 'BOOKING_RESCHEDULED') {
-      await query(UPSERT, bookingRow(p));
+      const { rows } = await query(UPSERT, bookingRow(p));
+      if (triggerEvent === 'BOOKING_CREATED' && !p.rescheduleUid) await sendSurvey(rows[0], p);
       if (p.rescheduleUid) {
         await query(`UPDATE bookings SET status = 'rescheduled', updated_at = now() WHERE cal_uid = $1`, [p.rescheduleUid]);
       }
     } else if (triggerEvent === 'BOOKING_CANCELLED' || triggerEvent === 'BOOKING_REJECTED') {
       // Insert first in case the "created" delivery never arrived.
       await query(UPSERT, bookingRow(p));
-      await query(`UPDATE bookings SET status = 'cancelled', updated_at = now() WHERE cal_uid = $1`, [p.uid]);
+      const { rows } = await query(
+        `UPDATE bookings SET status = 'cancelled', updated_at = now() WHERE cal_uid = $1 RETURNING survey_email_id`, [p.uid]);
+      // Cancelled within the 10 minutes: stop the survey email. Already sent = Resend refuses; fine.
+      await cancelEmail(rows[0]?.survey_email_id).catch(() => {});
     } else {
       return res.json({ ok: true, ignored: triggerEvent });
     }

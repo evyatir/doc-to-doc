@@ -1,8 +1,7 @@
-// /survey — two-question follow-up sent by email ~10 minutes after a lead
-// books an intro call. Set in the site's type and palette. Not wired yet:
-// submit() only logs; the backend (and matching the answers to the booking,
-// via ?b=<cal booking uid>) comes later.
-import React, { useState } from 'react';
+// /survey — the 12-second survey, emailed ~10 minutes after a lead books an
+// intro call (backend/email.js). ?b=<cal booking uid> ties the answers to the
+// booking; they show next to the call in /admin.
+import React, { useEffect, useState } from 'react';
 import { useSeo } from './seo.js';
 
 const home = import.meta.env.BASE_URL;
@@ -27,10 +26,16 @@ function toggle(list, option, unsure) {
   return list.filter((o) => o !== unsure).concat(option);
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 async function submit(answers) {
   const booking = new URLSearchParams(window.location.search).get('b');
-  // TODO(backend): POST { booking, ...answers } to the API.
-  console.info('[survey] answers', { booking, ...answers });
+  const res = await fetch(`${API_BASE}/api/survey`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ booking, ...answers }),
+  });
+  if (!res.ok) throw new Error(`survey ${res.status}`);
 }
 
 // Stethoscope drawn in on load (the tubing traces itself, then the chest
@@ -70,6 +75,10 @@ export default function Survey() {
   const [answers, setAnswers] = useState({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  // Wake the API (Render free tier sleeps) while they read the first question.
+  useEffect(() => { fetch(`${API_BASE}/api/health`).catch(() => {}); }, []);
 
   const current = STEPS[step];
   const picked = (current && answers[current.key]) || [];
@@ -79,8 +88,15 @@ export default function Survey() {
     if (!picked.length) return;
     if (!last) return setStep(step + 1);
     setBusy(true);
-    await submit(answers);
-    setDone(true);
+    setError('');
+    try {
+      await submit(answers);
+      setDone(true);
+    } catch {
+      // Render's free tier can take ~50 s to wake; a retry usually works.
+      setError('That didn’t go through. Please try again in a moment.');
+      setBusy(false);
+    }
   };
 
   return (
@@ -124,6 +140,7 @@ export default function Survey() {
                 {last ? (busy ? 'Sending…' : 'Send') : 'Next'}
               </button>
             </div>
+            {error && <p className="sv-error" role="alert">{error}</p>}
           </>
         )}
       </section>
@@ -154,6 +171,7 @@ const css = `
 .sv-next{background:#496677;color:#fff;border:0;border-radius:999px;padding:14px 34px;font:inherit;font-size:1rem;cursor:pointer;transition:opacity .15s}
 .sv-next:disabled{opacity:.35;cursor:default}
 .sv-link{background:none;border:0;padding:0;font:inherit;font-size:.95rem;color:#496677;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.sv-error{margin-top:14px;color:#a0352b;font-size:.9rem;text-align:right}
 .sv-done{text-align:center;padding:24px 0 8px}
 .sv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:6px}
 .sv-steth{flex:0 0 auto;width:76px;height:76px;margin:-30px -8px 4px 0}
