@@ -1,8 +1,7 @@
-// Booking designs (branch booking-designs) — three ways to let a lead pick a
-// free 30-minute Zoom call instead of writing an email. Slots and bookings go
-// through cal.js: real Cal.com when VITE_CAL_USERNAME is set, fake otherwise.
-//
-// Pick a design with ?design=a|b|c; a small switcher bar is shown for review.
+// Booking pop-up: every "Book a free introductory call" button opens it, and
+// the lead picks a free 30-minute Zoom call instead of writing an email.
+// Slots and bookings go through cal.js: real Cal.com when VITE_CAL_USERNAME is
+// set, fake preview times otherwise.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { getSlots, book, LIVE, TIME_ZONE as TZ } from './cal.js';
@@ -12,21 +11,7 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const EMAIL = 'Doctodocmentors@gmail.com';
 
-export const DESIGNS = {
-  a: { name: 'Pop-up', blurb: 'Button opens a calendar window' },
-  b: { name: 'On the page', blurb: 'Calendar sits in the Contact section' },
-  c: { name: 'Quick times', blurb: 'Next free times shown as one-tap chips' },
-};
-
-export function currentDesign() {
-  const d = new URLSearchParams(window.location.search).get('design');
-  return DESIGNS[d] ? d : 'a';
-}
-
-// The switcher bar is for review links only (?design=…), never for visitors.
-export const REVIEWING = DESIGNS[new URLSearchParams(window.location.search).get('design')] !== undefined;
-
-// Pop-up state shared by every "Book" button on the page (design A).
+// Pop-up state shared by every "Book" button on the page.
 const BookingCtx = createContext({ openPopup: () => {} });
 export const useBooking = () => useContext(BookingCtx);
 
@@ -78,7 +63,6 @@ function SlotsFallback({ error }) {
 }
 
 const fmtDay = (d) => d.toLocaleDateString('en-GB', { weekday: 'short' });
-const fmtNum = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 const fmtTime = (d) => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 const fmtFull = (d) => d.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
@@ -126,8 +110,8 @@ function Done({ booking: { start: slot, email } }) {
   );
 }
 
-// Full picker: day strip → times → details → done. Used by designs A and B.
-export function Picker() {
+// Day strip → times → details → done.
+function Picker() {
   const { days, error } = useSlots();
   const [day, setDay] = useState(0);
   const [slot, setSlot] = useState(null);
@@ -158,48 +142,6 @@ export function Picker() {
   );
 }
 
-// Design C: the next few free times as chips, a link to show the full picker.
-export function QuickTimes() {
-  const { days, error } = useSlots();
-  const [slot, setSlot] = useState(null);
-  const [booking, setBooking] = useState(null);
-  const [more, setMore] = useState(false);
-  if (more) return <div className="bk-inline"><Picker /></div>;
-  if (booking) return <div className="bk-inline"><Done booking={booking} /></div>;
-  if (slot) return <div className="bk-inline"><DetailsForm slot={slot} onBack={() => setSlot(null)} onDone={setBooking} /></div>;
-  if (!days) return <p className="bk-quick bk-muted">Loading available times…</p>;
-  if (!days.length) return <div className="bk-quick"><SlotsFallback error={error} /></div>;
-  const next = days.flatMap((d) => d.times).slice(0, 6);
-  return (
-    <div className="bk-quick">
-      <p className="bk-step">Next free times <span className="bk-muted">({TZ})</span></p>
-      <div className="bk-chips">
-        {next.map((t) => (
-          <button key={+t} type="button" className="bk-chip" onClick={() => setSlot(t)}>
-            <span>{fmtDay(t)} {fmtNum(t)}</span><b>{fmtTime(t)}</b>
-          </button>
-        ))}
-      </div>
-      <button type="button" className="bk-link" onClick={() => setMore(true)}>See all available times →</button>
-    </div>
-  );
-}
-
-// Floating bar so the reviewer can flip between designs.
-export function DesignSwitcher({ design }) {
-  const go = (d) => { const u = new URL(window.location.href); u.searchParams.set('design', d); window.location.href = u.toString(); };
-  return (
-    <div className="bk-switcher" role="navigation" aria-label="Design preview">
-      <span>Booking design:</span>
-      {Object.entries(DESIGNS).map(([k, v]) => (
-        <button key={k} type="button" className={k === design ? 'is-on' : ''} onClick={() => go(k)} title={v.blurb}>
-          {k.toUpperCase()} · {v.name}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export const bookingCss = `
 .bk-overlay{position:fixed;inset:0;z-index:60;background:rgba(20,30,40,.55)}
 .bk-dialog{position:fixed;z-index:61;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:#f0ede8;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:"DM Sans",Arial,sans-serif;color:#1f2a33}
@@ -217,8 +159,7 @@ export const bookingCss = `
 .bk-day.is-on b{color:#fff}
 .bk-times{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .bk-time{padding:12px 0;border:1px solid #496677;background:#fff;color:#496677;font-size:1rem;cursor:pointer}
-.bk-time:hover,.bk-chip:hover{background:#496677;color:#fff}
-.bk-chip:hover span{color:#fff}
+.bk-time:hover{background:#496677;color:#fff}
 .bk-form{display:flex;flex-direction:column;gap:14px}
 .bk-chosen{font-weight:500;color:#496677;border-left:3px solid #496677;padding-left:10px}
 .bk-form label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:#1f2a33}
@@ -233,17 +174,4 @@ export const bookingCss = `
 .bk-error{color:#a0352b;font-size:.9rem}
 .bk-primary:disabled{opacity:.6;cursor:default}
 .bk-preview-note{margin-top:10px;font-size:.75rem;color:#a0552b}
-.bk-inline{background:#fff;border:1px solid #d8dcdf;padding:22px;margin-top:26px;font-family:"DM Sans",Arial,sans-serif;color:#1f2a33}
-.bk-inline .bk-day{background:#f0ede8}
-.bk-inline .bk-day.is-on{background:#496677}
-.bk-quick{margin-top:26px;font-family:"DM Sans",Arial,sans-serif}
-.bk-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
-.bk-chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border:1px solid #496677;background:#fff;color:#1f2a33;cursor:pointer;text-align:left}
-.bk-chip span{font-size:.78rem;color:#496677}
-.bk-chip b{font-size:1.15rem;font-weight:500}
-.bk-switcher{position:fixed;z-index:70;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 32px);background:#1f2a33;color:#fff;padding:8px 10px;font:13px "DM Sans",Arial,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.3)}
-.bk-switcher span{opacity:.75;padding:0 4px}
-.bk-switcher button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);padding:6px 10px;font:inherit;cursor:pointer}
-.bk-switcher button.is-on{background:#fff;color:#1f2a33}
-@media (max-width:600px){.bk-switcher{flex-wrap:nowrap;gap:4px;padding:6px;font-size:11px;bottom:10px}.bk-switcher span{display:none}.bk-switcher button{padding:5px 7px;white-space:nowrap}}
 `;

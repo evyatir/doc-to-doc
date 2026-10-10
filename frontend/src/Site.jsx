@@ -8,9 +8,7 @@ import React, { useEffect, useState } from 'react';
 import * as Accordion from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
 import Consent, { openConsent } from './Consent.jsx';
-import { BookingProvider, useBooking, currentDesign, Picker, QuickTimes, DesignSwitcher, REVIEWING, bookingCss } from './Booking.jsx';
-
-const DESIGN = currentDesign();
+import { BookingProvider, useBooking, bookingCss } from './Booking.jsx';
 
 const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -68,11 +66,9 @@ function Icon({ name, size = 24, className = '' }) {
 
 function BookButton({ className = '', children = 'Book a free introductory call' }) {
   const { openPopup } = useBooking();
-  // Design A opens the booking pop-up; B and C scroll to the Contact section,
-  // where the times are shown.
-  const onClick = DESIGN === 'a' ? (e) => { e.preventDefault(); openPopup(); } : undefined;
+  // Opens the booking pop-up; the mailto: href stays as the no-JS fallback.
   return (
-    <a className={`button ${className}`} href={DESIGN === 'a' ? BOOK_HREF : '#contact'} onClick={onClick}>
+    <a className={`button ${className}`} href={BOOK_HREF} onClick={(e) => { e.preventDefault(); openPopup(); }}>
       {children}
       <Icon name="arrow-up-right" size={19} />
     </a>
@@ -356,12 +352,8 @@ export default function Site() {
               <p className="eyebrow">04 / LET’S TALK</p>
               <h2>Your next chapter starts with<br /><em>a conversation.</em></h2>
               <p>Tell us where you are in your journey, what you’re considering, and what you’d like help with.</p>
-              {DESIGN === 'a' && <>
-                <BookButton />
-                <span className="booking-note">Pick a time that suits you — 30 minutes on Zoom.</span>
-              </>}
-              {DESIGN === 'b' && <div className="bk-inline"><Picker /></div>}
-              {DESIGN === 'c' && <QuickTimes />}
+              <BookButton />
+              <span className="booking-note">Pick a time that suits you — 30 minutes on Zoom.</span>
               <div className="contact-links">
                 <a href={`mailto:${EMAIL}`}>{EMAIL}<Icon name="arrow-up-right" size={17} /></a>
                 <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram · @doctodcomentor<Icon name="arrow-up-right" size={17} /></a>
@@ -394,7 +386,6 @@ export default function Site() {
         </div>
       </footer>
       <Consent />
-      {REVIEWING && <DesignSwitcher design={DESIGN} />}
     </BookingProvider>
   );
 }
