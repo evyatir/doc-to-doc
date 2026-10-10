@@ -42,7 +42,7 @@ const FAQ = [
   ['Do I need to know which university I want?', 'No. We can help you explore medical schools and build a shortlist around your goals, priorities, and circumstances. You don’t need to have it all figured out before we meet.'],
   ['What does application support include?', 'We help you understand the steps for your chosen applications, organise your documents, and prepare and review your application materials. We can also discuss your questions about studying medicine and moving abroad.'],
   ['Can you guarantee admission?', 'No. Admission decisions belong to each university and cannot be guaranteed. Our role is to help you approach the application process with greater clarity, organisation, and confidence.'],
-  ['How do I get started?', 'Arrange a free introductory call. Tell us where you are in your journey and what you would like help with. Pick a time that suits you and we’ll send you a Zoom link for a 30-minute call.'],
+  ['How do I get started?', 'Arrange a free introductory call. Tell us where you are in your journey and what you would like help with. Pick a time that suits you and we’ll send you a Google Meet link for a 30-minute call.'],
 ];
 
 // lucide icons used by the original, same paths and default attributes.
@@ -353,7 +353,7 @@ export default function Site() {
               <h2>Your next chapter starts with<br /><em>a conversation.</em></h2>
               <p>Tell us where you are in your journey, what you’re considering, and what you’d like help with.</p>
               <BookButton />
-              <span className="booking-note">Pick a time that suits you — 30 minutes on Zoom.</span>
+              <span className="booking-note">Pick a time that suits you — 30 minutes on Google Meet.</span>
               <div className="contact-links">
                 <a href={`mailto:${EMAIL}`}>{EMAIL}<Icon name="arrow-up-right" size={17} /></a>
                 <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram · @doctodcomentor<Icon name="arrow-up-right" size={17} /></a>

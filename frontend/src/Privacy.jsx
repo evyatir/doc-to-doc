@@ -56,7 +56,7 @@ export default function Privacy() {
 
         <h2 style={s.h2}>What we collect</h2>
         <h3 style={s.h3}>When you book a call</h3>
-        <p style={s.p}>The booking calendar shows our free times and lets you book a free 30-minute introductory call. We receive the time you choose, your name, your email address, your time zone, and anything you write about where you are in your journey. Bookings are handled by Cal.com, which checks our calendar and sends the invitation to you and to us. The call itself takes place on Zoom, and the invitation contains the Zoom link. We also keep a copy of each booking in our own database so we can follow up.</p>
+        <p style={s.p}>The booking calendar shows our free times and lets you book a free 30-minute introductory call. We receive the time you choose, your name, your email address, your time zone, and anything you write about where you are in your journey. Bookings are handled by Cal.com, which checks our calendar and sends the invitation to you and to us. The call itself takes place on Google Meet, and the invitation contains the Meet link. We also keep a copy of each booking in our own database so we can follow up.</p>
         <h3 style={s.h3}>When you email us</h3>
         <p style={s.p}>We receive what you choose to send, usually your name and email address and your question. Your message reaches us through Gmail.</p>
         <h3 style={s.h3}>When you browse the site, only if you accept cookies</h3>
@@ -83,9 +83,8 @@ export default function Privacy() {
         <h2 style={s.h2}>Who processes data for us</h2>
         <p style={s.p}>We do not sell your data or share it for anyone’s marketing. These providers process data on our behalf:</p>
         <Table head={['Provider', 'What for']} rows={[
-          ['Google LLC / Google Ireland Ltd', 'Google Analytics, Gmail and Google Calendar'],
+          ['Google LLC / Google Ireland Ltd', 'Google Analytics, Gmail, Google Calendar and Google Meet (video calls)'],
           ['Cal.com, Inc.', 'Booking calendar and call invitations'],
-          ['Zoom Communications, Inc.', 'Video calls'],
           ['Render Services, Inc.', 'Our booking records server'],
           ['Neon, Inc.', 'Our booking records database (EU, Frankfurt)'],
           ['GitHub, Inc.', 'Website hosting (GitHub Pages)'],

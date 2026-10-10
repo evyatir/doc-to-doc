@@ -1,5 +1,5 @@
 // Booking pop-up: every "Book a free introductory call" button opens it, and
-// the lead picks a free 30-minute Zoom call instead of writing an email.
+// the lead picks a free 30-minute Google Meet call instead of writing an email.
 // Slots and bookings go through cal.js: real Cal.com when VITE_CAL_USERNAME is
 // set, fake preview times otherwise.
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -85,7 +85,7 @@ function DetailsForm({ slot, onBack, onDone }) {
   };
   return (
     <form className="bk-form" onSubmit={submit}>
-      <p className="bk-chosen">{fmtFull(slot)} · 30 min · Zoom</p>
+      <p className="bk-chosen">{fmtFull(slot)} · 30 min · Google Meet</p>
       <label>Your name<input name="name" required autoComplete="name" /></label>
       <label>Your email<input name="email" type="email" required autoComplete="email" /></label>
       <label>Where are you in your journey? <span>(optional)</span><textarea name="note" rows={2} /></label>
@@ -104,7 +104,7 @@ function Done({ booking: { start: slot, email } }) {
       <p className="bk-done-mark">✓</p>
       <p className="bk-done-title">You’re booked.</p>
       <p>{fmtFull(slot)}</p>
-      <p className="bk-muted">A calendar invite with the Zoom link is on its way to <b>{email}</b>.</p>
+      <p className="bk-muted">A calendar invite with the Google Meet link is on its way to <b>{email}</b>.</p>
       {!LIVE && <p className="bk-preview-note">Preview only — nothing was booked.</p>}
     </div>
   );
@@ -137,7 +137,7 @@ function Picker() {
           <button key={+t} type="button" className="bk-time" onClick={() => setSlot(t)}>{fmtTime(t)}</button>
         ))}
       </div>
-      <p className="bk-muted bk-small">30-minute Zoom call · free · no commitment</p>
+      <p className="bk-muted bk-small">30-minute Google Meet call · free · no commitment</p>
     </div>
   );
 }

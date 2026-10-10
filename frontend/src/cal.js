@@ -1,7 +1,7 @@
 // Cal.com client for the booking picker. Talks to Cal.com's public API v2
 // straight from the browser (CORS is open, no API key needed for reading
 // free slots or booking as an attendee). Cal.com owns the rest: it checks the
-// team's Google Calendar, creates the Zoom meeting, and emails the invite to
+// team's Google Calendar, creates the Google Meet link, and emails the invite to
 // the lead and to Doctodocmentors@gmail.com.
 //
 // VITE_CAL_USERNAME unset = preview mode: fake slots, nothing is booked.
