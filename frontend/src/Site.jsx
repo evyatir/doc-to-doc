@@ -14,7 +14,7 @@ const asset = (name) => `${import.meta.env.BASE_URL}assets/${name}`;
 
 const EMAIL = 'Doctodocmentors@gmail.com';
 const BOOK_HREF = `mailto:${EMAIL}?subject=Let's%20arrange%20a%20free%20introductory%20call&body=Hi%20Doc.%20to%20Doc.%2C%0A%0AI'd%20love%20to%20arrange%20a%20free%20introductory%20call.%0A%0AMy%20name%3A%0AWhere%20I%20am%20in%20my%20journey%3A%0AWhat%20I'd%20like%20help%20with%3A%0AMy%20availability%20and%20time%20zone%3A%0A%0AThank%20you!`;
-const INSTAGRAM = 'https://www.instagram.com/doctodcomentor/';
+const INSTAGRAM = 'https://www.instagram.com/doctodocmentors/';
 
 const NAV = [
   { title: 'Who we are', href: '#who-we-are' },
@@ -356,7 +356,7 @@ export default function Site() {
               <span className="booking-note">Pick a time that suits you — 30 minutes on Google Meet.</span>
               <div className="contact-links">
                 <a href={`mailto:${EMAIL}`}>{EMAIL}<Icon name="arrow-up-right" size={17} /></a>
-                <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram · @doctodcomentor<Icon name="arrow-up-right" size={17} /></a>
+                <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram · @doctodocmentors<Icon name="arrow-up-right" size={17} /></a>
               </div>
             </div>
           </div>
