@@ -75,6 +75,18 @@ function BookButton({ className = '', children = 'Book a free introductory call'
   );
 }
 
+// Inline text link that opens the booking pop-up, like BookButton.
+function BookLink({ children }) {
+  const { openPopup } = useBooking();
+  return <a className="inline-link" href={BOOK_HREF} onClick={(e) => { e.preventDefault(); openPopup(); }}>{children}</a>;
+}
+
+// Our tweaks on top of the client's compiled stylesheet.
+const siteOverridesCss = `
+.contact-copy>.button{font-weight:600;font-size:1.1rem}
+.contact-copy>.booking-note{font-weight:600;font-size:.9rem}
+`;
+
 // shadcn/ui Sheet, as the original composes it (Radix Dialog underneath).
 function MobileMenu({ open, onOpenChange }) {
   return (
@@ -193,6 +205,7 @@ export default function Site() {
   return (
     <BookingProvider>
       <style>{bookingCss}</style>
+      <style>{siteOverridesCss}</style>
       <a href="#main" className="skip-link">Skip to content</a>
       <header className="site-header">
         <div className="header-inner wrap">
@@ -279,7 +292,7 @@ export default function Site() {
                   <span className="anatomy-number" aria-hidden="true">01</span>
                   <p className="handwritten anatomy-note">what does your<br />future look like?</p>
                 </div>
-                <h3>( UNIVERSITY SELECTION )</h3>
+                <h3>(&nbsp;UNIVERSITY SELECTION&nbsp;)</h3>
                 <p className="anatomy-description">Explore medical schools and build a shortlist around your goals, priorities, and circumstances. </p>
               </li>
               <li className="anatomy-service anatomy-application">
@@ -295,7 +308,7 @@ export default function Site() {
                   <span className="anatomy-number" aria-hidden="true">03</span>
                   <p className="handwritten anatomy-note">a little guidance,<br />a little more confidence.</p>
                 </div>
-                <h3>( ONE-TO-ONE MENTORING )</h3>
+                <h3>(&nbsp;ONE-TO-ONE MENTORING&nbsp;)</h3>
                 <p className="anatomy-description">Studying medicine. Moving abroad. Finding your feet. Talk it through with people who have firsthand experience, and someone in your corner.</p>
               </li>
             </ol>
@@ -337,7 +350,7 @@ export default function Site() {
           <div className="faq-heading reveal">
             <p className="eyebrow">A LITTLE MORE CLARITY</p>
             <h2>Good questions.<br /><em>Honest answers.</em></h2>
-            <p>Still wondering about something?<br /><a href={`mailto:${EMAIL}`} className="inline-link">We’re here to talk.</a></p>
+            <p>Still wondering about something?<br /><BookLink>We’re here to talk.</BookLink></p>
           </div>
           <Faq />
         </section>
